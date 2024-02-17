@@ -7,3 +7,6 @@ gh-pages
 ^CONDUCT\.md$
 ^\.Rproj\.user$
 ^\.Rproj$
+docs
+^\.github
+README.html

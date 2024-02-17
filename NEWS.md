@@ -1,3 +1,16 @@
+# ggsc 1.1.2.002
+
++ support plotting pie for spatial data (2023-12-13, Wed, #18)
++ extract `meta.data` of Seurat object (2023-12-12, Tue, #17)
+
+# ggsc 1.1.2
+
++ add `sc_dot()` methods (2023-11-29, Wed, #15)
++ update vignette to link to the online docs (<https://yulab-smu.top/ggsc>)
++ add `README.Rmd` and `README.md` in github repo
++ optimization: retrieve embedding without `FetchData` (2023-11-27, Mon, #14)
++ bug fixed for Seurat object (2023-10-31, Tue, #12, #13)
+
 # ggsc 1.1.1
 
 + ignore the tissue section when image is not exist (2023-10-31, Tue, #12)
@@ -39,4 +52,10 @@
 
 # scplot 0.0.1
 
-+ `sc_dim`, `sc_dim_geom_feature`, `sc_dim_geom_label`, `sc_feature`, `sc_geom_point` and `sc_violin` functions (2022-11-09, Wed)
++ several functions implemented (2022-11-09, Wed)
+    - `sc_dim`
+    - `sc_dim_geom_feature`
+    - `sc_dim_geom_label`
+    - `sc_feature`
+    - `sc_geom_point`
+    - `sc_violin`

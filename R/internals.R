@@ -18,13 +18,42 @@
    return(res)
 }
 
-.split.by.feature <- function(p, ncol){
+.split.by.feature <- function(p, ncol, joint = FALSE){
    rlang::check_installed('aplot', 'for split ggplot object by features.')
    p <- p$data |> dplyr::group_split(.data$features) |>
            lapply(function(i){
-              p$data <-i
+              p$data <- i
               return(p)
             })
+
+   indx <- length(p)
+   
+   if (joint){
+      p[[indx]] <- p[[indx]] + ggplot2::labs(colour = 'joint_density')
+   }
+   
    p <- aplot::plot_list(gglist = p, ncol = ncol)
    return(p)
+}
+
+#' @importFrom ggfun get_aes_var
+.cal_pie_radius <- function(data, mapping){
+   x <- ggfun::get_aes_var(mapping, 'x') 
+   y <- ggfun::get_aes_var(mapping, 'y')
+   r = (max(data[[x]], na.rm=TRUE) - min(data[[x]], na.rm=TRUE)) * (max(data[[y]], na.rm=TRUE) - min(data[[y]], na.rm=TRUE))
+   r = sqrt(r / nrow(data) / pi) * .85
+   return(r)
+}
+
+.cal_ratio <- function(data, mapping){
+   x <- ggfun::get_aes_var(mapping, 'x')
+   y <- ggfun::get_aes_var(mapping, 'y')
+   1*max(data[[x]], na.rm=TRUE)/max(data[[y]], na.rm=TRUE)
+}
+
+.set_default_cols <- function(n){
+    col2 <- c("#1f78b4", "#ffff33", "#c2a5cf", "#ff7f00", "#810f7c",
+              "#a6cee3", "#006d2c", "#4d4d4d", "#8c510a", "#d73027",
+              "#78c679", "#7f0000", "#41b6c4", "#e7298a", "#54278f")
+    grDevices::colorRampPalette(col2)(n)
 }

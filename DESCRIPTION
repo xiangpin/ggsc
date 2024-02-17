@@ -1,6 +1,6 @@
 Package: ggsc
-Title: Visualizing Single Cell Data
-Version: 1.1.1
+Title: Visualizing Single Cell and Spatial Transcriptomics
+Version: 1.1.2.002
 Authors@R: c(
        person("Guangchuang", "Yu", 
               email = "guangchuangyu@gmail.com", 
@@ -11,17 +11,19 @@ Authors@R: c(
               email = "xshuangbin@163.com",      
               role = "aut", 
               comment = c(ORCID="0000-0003-3513-5362")
-       )
+       ),
+       person("Noriaki", "Sato", 
+              email = "nori@hgc.jp", 
+              role = "ctb")
   )
 Description: Useful functions to visualize single cell and spatial 
-  data. It supports both 'SingleCellExperiment' and 'Seurat' objects.
-  It also supports visualizing the data using grammar of graphics 
-  implemented in 'ggplot2'.
+  data. It supports visualizing 'Seurat', 'SingleCellExperiment' and 'SpatialExperiment' objects through grammar of graphics syntax implemented in 'ggplot2'.
 Imports:
   Rcpp,
   RcppParallel,
   cli,
   dplyr,
+  ggfun,
   ggplot2,
   grDevices,
   grid,
@@ -36,6 +38,7 @@ Imports:
   tidyr,
   tibble,
   utils,
+  RColorBrewer,
   yulab.utils
 Suggests:
   aplot,
@@ -51,6 +54,7 @@ Suggests:
   rmarkdown,
   scran,
   scater,
+  scatterpie,
   scuttle,
   shadowtext,
   sf,
@@ -59,7 +63,7 @@ Suggests:
   STexampleData,
   testthat (>= 3.0.0)
 BugReports: https://github.com/YuLab-SMU/ggsc/issues 
-URL: https://github.com/YuLab-SMU/ggsc
+URL: https://github.com/YuLab-SMU/ggsc (devel), https://yulab-smu.top/ggsc/ (docs)
 biocViews: DimensionReduction, GeneExpression, SingleCell, 
   Software, Spatial, Transcriptomics,Visualization
 VignetteBuilder: knitr
