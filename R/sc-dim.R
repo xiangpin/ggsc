@@ -173,6 +173,10 @@ get_dim_data <- function(object, features = NULL,
     }
 
     if (!is.null(features)){
+        if (is.numeric(features)){
+            features <- features[features <= nrow(object)]
+            features <- rownames(object)[features]
+        }
         tmp <- SeuratObject::FetchData(object, vars = features, cells = cells, slot = slot)
         if (density && !is.null(reduced.dat) && !plot.pie){
             tmp <- .buildWkde(t(tmp), reduced.dat, grid.n, joint, joint.fun)
