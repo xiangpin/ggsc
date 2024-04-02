@@ -56,15 +56,9 @@ setMethod("sc_violin", 'Seurat', function(object, features,
         d <- .fun(d)
     }
 
-    default_mapping <- .check_aes_nm(object, data= d, prefix = 'ident', aes.character = 'fill')
+    mapping <- .check_aes_mapping(object, mapping, data= d, prefix = 'ident', aes.character = 'fill')
 
-    if (is.null(mapping)) {
-        mapping <- default_mapping
-    } else {
-        mapping <- modifyList(default_mapping, mapping)
-    }
-
-    mapping <- .add_aes(mapping, prefix = c('ident', 'value'), aes.character = c('x', 'y'))
+    mapping <- .add_aes(mapping, object, d, prefix = c('ident', 'value'), aes.character = c('x', 'y'))
 
     p <- ggplot(d, mapping) + 
         geom_violin(...) #+ 
@@ -97,15 +91,9 @@ setMethod('sc_violin', 'SingleCellExperiment',
         d <- .fun(d)
     }
     
-    default_mapping <- .check_aes_nm(object, data= d, prefix = 'label', aes.character = 'fill')
+    mapping <- .check_aes_mapping(object, mapping, data= d, prefix = 'label', aes.character = 'fill')
 
-    if (is.null(mapping)) {
-        mapping <- default_mapping
-    } else {
-        mapping <- modifyList(default_mapping, mapping)
-    }
-    
-    mapping <- .add_aes(mapping, prefix = c('label', 'value'), aes.character = c('x', 'y'))
+    mapping <- .add_aes(mapping, object, d, prefix = c('label', 'value'), aes.character = c('x', 'y'))
     
     p <- ggplot(d, mapping) +
         geom_violin(...) #+

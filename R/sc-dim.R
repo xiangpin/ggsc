@@ -68,13 +68,8 @@ setMethod("sc_dim",
                     dims = dims, reduction = reduction, 
                     cells = cells, slot = slot)
     
-    default_mapping <- .check_aes_nm(object, data = d, prefix = 'ident')
+    mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'ident')
 
-    if (is.null(mapping)) {
-        mapping <- default_mapping
-    } else {
-        mapping <- modifyList(default_mapping, mapping)
-    }               
     p <- sc_dim_internal(d, mapping, ...)
     return(p)
 })
@@ -96,13 +91,8 @@ setMethod('sc_dim', 'SingleCellExperiment',
     d <- .extract_sce_data(object = object, features = NULL, dims = dims, 
                       reduction = reduction, cells = cells, slot = slot)
     
-    default_mapping <- .check_aes_nm(object, data = d, prefix = 'label')
+    mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'label')
 
-    if (is.null(mapping)){
-        mapping <- default_mapping
-    }else{
-        mapping <- modifyList(default_mapping, mapping)
-    }
     p <- sc_dim_internal(d, mapping, ...)
     return(p)
 
@@ -201,6 +191,10 @@ get_dim_data <- function(object, features = NULL,
     }
 
     if (!is.null(features)){
+        if (is.numeric(features)){
+            features <- features[features <= nrow(object)]
+            features <- rownames(object)[features]
+        }
         tmp <- SeuratObject::FetchData(object, vars = features, cells = cells, slot = slot)
         if (density && !is.null(reduced.dat) && !plot.pie){
             tmp <- .buildWkde(t(tmp), reduced.dat, grid.n, joint, joint.fun)
