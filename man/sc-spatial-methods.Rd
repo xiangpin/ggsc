@@ -28,7 +28,7 @@ sc_spatial(
   joint = FALSE,
   joint.fun = prod,
   common.legend = TRUE,
-  point.size = 5,
+  pointsize = 5,
   ...
 )
 
@@ -52,7 +52,7 @@ sc_spatial(
   joint = FALSE,
   joint.fun = prod,
   common.legend = TRUE,
-  point.size = 5,
+  pointsize = 5,
   ...
 )
 
@@ -76,7 +76,7 @@ sc_spatial(
   joint = FALSE,
   joint.fun = prod,
   common.legend = TRUE,
-  point.size = 5,
+  pointsize = 5,
   ...
 )
 }
@@ -130,9 +130,21 @@ default is prod.}
 \item{common.legend}{whether to use \code{facet_wrap} to display the multiple
 \code{features}, default is TRUE.}
 
-\item{point.size}{the size of point, default is 5.}
+\item{pointsize}{the size of point, default is 5.}
 
-\item{...}{additional parameters.}
+\item{...}{additional parameters, see also \code{geom_scattermore2()}.
+\itemize{
+\item \code{bg_colour} the colour of background point, default is \code{NA}.
+this character also can be set in \code{mappint}.
+\item \code{gap_colour} the colour of gap background, default is \code{'white'}.
+\item \code{bg_line_width} the line width of background point,
+default is \code{.3}.
+\item \code{gap_line_width} the gap line width of background point,
+default is \code{.1}.
+\item \code{alpha} the transparency of colour, default is 1.
+\item \code{subset} subset the data frame which meet conditions to display.
+this should be set in \code{mapping}.
+}}
 }
 \value{
 ggplot object

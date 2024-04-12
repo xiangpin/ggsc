@@ -92,7 +92,19 @@ default is prod.}
 \item{common.legend}{whether to use \code{facet_wrap} to display the multiple
 \code{features}, default is TRUE.}
 
-\item{...}{additional parameters pass to 'scattermore::geom_scattermore()'}
+\item{...}{additional parameters pass to 'scattermore::geom_scattermore()'
+\itemize{
+\item \code{bg_colour} the colour of background point, default is \code{NA}.
+this character also can be set in \code{mappint}.
+\item \code{gap_colour} the colour of gap background, default is \code{'white'}.
+\item \code{bg_line_width} the line width of background point,
+default is \code{.3}.
+\item \code{gap_line_width} the gap line width of background point,
+default is \code{.1}.
+\item \code{alpha} the transparency of colour, default is 1.
+\item \code{subset} subset the data frame which meet conditions to display.
+this should be set in \code{mapping}.
+}}
 }
 \value{
 dimension reduction plot colored by selected features

@@ -14,7 +14,7 @@
 ##' sc_geom_point()
 sc_geom_point <- function(mapping=NULL, ...){
     default_params <- list(mapping = mapping, 
-                        pointsize = 4,
+                        pointsize = 3,
                         pixels = c(700, 700)
                     )
     params <- modifyList(default_params, list(...))
@@ -34,12 +34,13 @@ sc_geom_point <- function(mapping=NULL, ...){
 #' passed to \code{\link[grid]{rasterGrob}}.
 #' @param pointsize Radius of rasterized point. Use ‘0’ for single pixels (fastest).
 #' @param pixels Vector with X and Y resolution of the raster, default \code{c(512,512)}.
-#' @param gap_colour colour between the background and top point point layer,
-#' default is \code{white}. 
+#' @param gap_colour colour of gap background between the bottom background 
+#' and top point point layer, default is \code{white}. 
+#' @param gap_alpha numeric the transparency of gap background colour, default is 1.
 #' @param bg_line_width numeric the line width of background point layer, 
 #' default is \code{0.3}.
 #' @param gap_line_width numeric the line width of gap between the background and 
-#' top point point layer, default is \code{.05}.
+#' top point point layer, default is \code{.1}.
 #' @param ... Other arguments passed on to \code{\link[ggplot2]{layer}}.
 #' @details
 #'  \itemize{
@@ -61,7 +62,7 @@ sc_geom_point <- function(mapping=NULL, ...){
 geom_scattermore2 <- function(mapping = NULL, data = NULL, stat = "identity", position = "identity", ...,
                              na.rm = FALSE, show.legend = NA, inherit.aes = TRUE,
                              interpolate = FALSE, pointsize = 0, pixels = c(512, 512),
-                             gap_colour = 'white', bg_line_width = .3, gap_line_width = .05){
+                             gap_colour = 'white', gap_alpha = 1, bg_line_width = .3, gap_line_width = .1){
   ggplot2::layer(
     data = data,
     mapping = mapping,
@@ -76,6 +77,7 @@ geom_scattermore2 <- function(mapping = NULL, data = NULL, stat = "identity", po
       pointsize = pointsize,
       pixels = pixels,
       gap_colour = gap_colour,
+      gap_alpha = gap_alpha,
       bg_line_width = bg_line_width,
       gap_line_width = gap_line_width,
       ...
@@ -104,8 +106,9 @@ GeomScattermore2 <- ggplot2::ggproto("GeomScattermore2", ggplot2::Geom,
                         na.rm = FALSE,
                         pixels = c(512, 512),
                         gap_colour = 'white',
+                        gap_alpha = 1,
                         bg_line_width = .3,
-                        gap_line_width = .05){
+                        gap_line_width = .1){
     coords <- coord$transform(data, pp)
 
     upperimage <- scattermore(cbind(coords$x, coords$y),
@@ -126,7 +129,7 @@ GeomScattermore2 <- ggplot2::ggproto("GeomScattermore2", ggplot2::Geom,
                                ylim = c(0, 1),
                                size = pixels)
         gapimage <- scattermore(cbind(coords$x, coords$y),
-                                rgba = grDevices::col2rgb(alpha = TRUE, scales::alpha(gap_colour, 1)),
+                                rgba = grDevices::col2rgb(alpha = TRUE, scales::alpha(gap_colour, gap_alpha)),
                                 cex = gapsize,
                                 xlim = c(0, 1),
                                 ylim = c(0, 1),

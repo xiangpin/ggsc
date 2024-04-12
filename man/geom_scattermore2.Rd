@@ -17,8 +17,9 @@ geom_scattermore2(
   pointsize = 0,
   pixels = c(512, 512),
   gap_colour = "white",
+  gap_alpha = 1,
   bg_line_width = 0.3,
-  gap_line_width = 0.05
+  gap_line_width = 0.1
 )
 }
 \arguments{
@@ -77,14 +78,16 @@ passed to \code{\link[grid]{rasterGrob}}.}
 
 \item{pixels}{Vector with X and Y resolution of the raster, default \code{c(512,512)}.}
 
-\item{gap_colour}{colour between the background and top point point layer,
-default is \code{white}.}
+\item{gap_colour}{colour of gap background between the bottom background
+and top point point layer, default is \code{white}.}
+
+\item{gap_alpha}{numeric the transparency of gap background colour, default is 1.}
 
 \item{bg_line_width}{numeric the line width of background point layer,
 default is \code{0.3}.}
 
 \item{gap_line_width}{numeric the line width of gap between the background and
-top point point layer, default is \code{.05}.}
+top point point layer, default is \code{.1}.}
 }
 \value{
 polygonal point layer

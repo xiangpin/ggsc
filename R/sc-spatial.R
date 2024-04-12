@@ -30,8 +30,20 @@
 ##' default is prod.
 ##' @param common.legend whether to use \code{facet_wrap} to display the multiple
 ##' \code{features}, default is TRUE.
-##' @param point.size the size of point, default is 5.
-##' @param ... additional parameters.
+##' @param pointsize the size of point, default is 5.
+##' @param ... additional parameters, see also \code{geom_scattermore2()}.
+##' \itemize{
+##'     \item \code{bg_colour} the colour of background point, default is \code{NA}.
+##'      this character also can be set in \code{mappint}.
+##'     \item \code{gap_colour} the colour of gap background, default is \code{'white'}.
+##'     \item \code{bg_line_width} the line width of background point,
+##'      default is \code{.3}.
+##'     \item \code{gap_line_width} the gap line width of background point,
+##'      default is \code{.1}.
+##'     \item \code{alpha} the transparency of colour, default is 1.
+##'     \item \code{subset} subset the data frame which meet conditions to display.
+##'      this should be set in \code{mapping}.
+##'  }
 ##' @return ggplot object
 ##' @importFrom grid rasterGrob unit
 ##' @importFrom ggplot2 facet_grid annotation_custom
@@ -74,7 +86,7 @@ setGeneric('sc_spatial', function(object,
                                   joint = FALSE,
                                   joint.fun = prod,
                                   common.legend = TRUE,
-                                  point.size = 5,
+                                  pointsize = 5,
                                   ...) 
            standardGeneric('sc_spatial')
 )
@@ -90,7 +102,7 @@ setMethod("sc_spatial", 'Seurat',
                    image.rotate.degree = NULL, image.mirror.axis = 'v', 
                    remove.point = FALSE, mapping = NULL, ncol = 6, 
                    density=FALSE, grid.n = 100, joint = FALSE, 
-                   joint.fun = prod, common.legend = TRUE, point.size = 5, ...) {
+                   joint.fun = prod, common.legend = TRUE, pointsize = 5, ...) {
     images <- SeuratObject::Images(object = object, 
                     assay = Seurat::DefaultAssay(object = object)
                 )
@@ -145,7 +157,6 @@ setMethod("sc_spatial", 'Seurat',
         mapping <- default_mapping
     }
 
-    ratio <- .cal_ratio(d, mapping)
 
     if (!plot.pie){
         p <- ggplot(d, mapping)
@@ -162,7 +173,7 @@ setMethod("sc_spatial", 'Seurat',
     }
 
     if ((!remove.point && (!is.null(features) || (any(names(mapping) %in% c('color', 'colour')) && is.null(features))) && !plot.pie)){
-        p <- p + sc_geom_point(pointsize = point.size, ...)
+        p <- p + sc_geom_point(pointsize = pointsize, ...)
     }else if (!remove.point && plot.pie){
         rlang::check_installed('scatterpie', 'is required when `plot.pie=TRUE`')
         p <- p + scatterpie::geom_scatterpie(data=d, mapping=mapping, cols='features', long_format=TRUE, pie_scale=pie.radius.scale, ...)
@@ -174,7 +185,7 @@ setMethod("sc_spatial", 'Seurat',
          .feature_setting(features, ncol, plot.pie) +
          ylab(NULL) +
          xlab(NULL) +
-         coord_fixed(ratio=ratio) +
+         coord_fixed() +
          theme_bw2() 
 
     color.aes <- .check_aes_exits(p$mapping, c('color', 'colour'))
@@ -282,8 +293,6 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
         mapping <- default_mapping
     }
 
-    ratio <- .cal_ratio(d, mapping)
-
     if (!plot.pie){
         p <- ggplot(d, mapping)
     }else{
@@ -299,7 +308,7 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
     }
 
     if ((!remove.point && (!is.null(features) || (any(names(mapping) %in% c('color', 'colour')) && is.null(features))) && !plot.pie)){
-        p <- p + sc_geom_point(pointsize = point.size, ...) 
+        p <- p + sc_geom_point(pointsize = pointsize, ...) 
     }else if (!remove.point && plot.pie){
         rlang::check_installed('scatterpie', 'is required when `plot.pie=TRUE`')
         p <- p + scatterpie::geom_scatterpie(data=d, mapping=mapping, cols='features', long_format=TRUE, pie_scale = pie.radius.scale, ...)
@@ -311,7 +320,7 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
          .feature_setting(features, ncol, plot.pie) +
          ylab(NULL) +
          xlab(NULL) +
-         coord_fixed(ratio = ratio) +
+         coord_fixed() +
          theme_bw2() 
 
     color.aes <- .check_aes_exits(p$mapping, c('color', 'colour'))
