@@ -39,7 +39,8 @@ Imports:
   tibble,
   utils,
   RColorBrewer,
-  yulab.utils
+  yulab.utils,
+  scales
 Suggests:
   aplot,
   BiocParallel,
