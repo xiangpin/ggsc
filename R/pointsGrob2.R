@@ -23,13 +23,17 @@ crasterGrob <- function(image, bg.image = NULL, gap.image = NULL,
                          just = just, hjust = hjust, vjust =vjust, 
                          interpolate = interpolate, default.units = default.units, 
                          name = name, gp = gp, vp = vp)
+    
+    if (is.null(gap.image)){
+        grobs <- gList(bgGrob, upperGrob)
+    }else{
+        gapGrob <- rasterGrob(gap.image, x = x, y = y, width = width, height = height,
+                              just = just, hjust = hjust, vjust =vjust,
+                              interpolate = interpolate, default.units = default.units,
+                              name = name, gp = gp, vp = vp)
+        grobs <-  gList(bgGrob, gapGrob, upperGrob)
+    }
 
-    gapGrob <- rasterGrob(gap.image, x = x, y = y, width = width, height = height,
-                         just = just, hjust = hjust, vjust =vjust,
-                         interpolate = interpolate, default.units = default.units,
-                         name = name, gp = gp, vp = vp)
-
-    grobs <- gList(bgGrob, gapGrob, upperGrob)
     gTree(children = grobs)       
 }
 
@@ -100,3 +104,11 @@ grid.cpoints <- function(x = stats::runif(10), y = stats::runif(10), pch = 1,
     invisible(pg)
 }
 
+
+.generate_circle_raster <- function(x, y){
+    index1 <- x != "#00000000"
+    index2 <- y != "#00000000"
+    index3 <- index1 == index2
+    x[index3] <- "#00000000"
+    return(x)
+}

@@ -19,7 +19,8 @@ geom_scattermore2(
   gap_colour = "white",
   gap_alpha = 1,
   bg_line_width = 0.3,
-  gap_line_width = 0.1
+  gap_line_width = 0.1,
+  bg_is_circle = FALSE
 )
 }
 \arguments{
@@ -88,6 +89,10 @@ default is \code{0.3}.}
 
 \item{gap_line_width}{numeric the line width of gap between the background and
 top point point layer, default is \code{.1}.}
+
+\item{bg_is_circle}{logical whether add the background point line, if it is
+\code{TRUE}, the circle point layer will be add, default is \code{FALSE},
+using bigger point layer instead of circle layer (faster).}
 }
 \value{
 polygonal point layer

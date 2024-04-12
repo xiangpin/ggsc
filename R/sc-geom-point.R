@@ -41,6 +41,9 @@ sc_geom_point <- function(mapping=NULL, ...){
 #' default is \code{0.3}.
 #' @param gap_line_width numeric the line width of gap between the background and 
 #' top point point layer, default is \code{.1}.
+#' @param bg_is_circle logical whether add the background point line, if it is 
+#' \code{TRUE}, the circle point layer will be add, default is \code{FALSE},
+#' using bigger point layer instead of circle layer (faster).
 #' @param ... Other arguments passed on to \code{\link[ggplot2]{layer}}.
 #' @details
 #'  \itemize{
@@ -62,7 +65,8 @@ sc_geom_point <- function(mapping=NULL, ...){
 geom_scattermore2 <- function(mapping = NULL, data = NULL, stat = "identity", position = "identity", ...,
                              na.rm = FALSE, show.legend = NA, inherit.aes = TRUE,
                              interpolate = FALSE, pointsize = 0, pixels = c(512, 512),
-                             gap_colour = 'white', gap_alpha = 1, bg_line_width = .3, gap_line_width = .1){
+                             gap_colour = 'white', gap_alpha = 1, bg_line_width = .3, 
+                             gap_line_width = .1, bg_is_circle = FALSE){
   ggplot2::layer(
     data = data,
     mapping = mapping,
@@ -80,6 +84,7 @@ geom_scattermore2 <- function(mapping = NULL, data = NULL, stat = "identity", po
       gap_alpha = gap_alpha,
       bg_line_width = bg_line_width,
       gap_line_width = gap_line_width,
+      bg_is_circle = bg_is_circle,
       ...
     )
   )
@@ -108,7 +113,8 @@ GeomScattermore2 <- ggplot2::ggproto("GeomScattermore2", ggplot2::Geom,
                         gap_colour = 'white',
                         gap_alpha = 1,
                         bg_line_width = .3,
-                        gap_line_width = .1){
+                        gap_line_width = .1,
+                        bg_is_circle = FALSE){
     coords <- coord$transform(data, pp)
 
     upperimage <- scattermore(cbind(coords$x, coords$y),
@@ -118,28 +124,48 @@ GeomScattermore2 <- ggplot2::ggproto("GeomScattermore2", ggplot2::Geom,
                               ylim = c(0, 1),
                               size = pixels)
 
+    bgimage <- gapimage <- NULL
+
     if (!all(is.null(coords$bg_colour)) || !all(is.na(coords$bg_colour))){
         tmpsize <- sqrt(pointsize)
         gapsize <- (tmpsize + tmpsize * gap_line_width * 2)^2
         bgsize <- gapsize + (sqrt(bg_line_width) + tmpsize * bg_line_width * 2) ^2
+        
         bgimage <- scattermore(cbind(coords$x, coords$y),
                                rgba = grDevices::col2rgb(alpha = TRUE, scales::alpha(coords$bg_colour, 1)),
                                cex = bgsize,
                                xlim = c(0, 1),
                                ylim = c(0, 1),
                                size = pixels)
+
         gapimage <- scattermore(cbind(coords$x, coords$y),
                                 rgba = grDevices::col2rgb(alpha = TRUE, scales::alpha(gap_colour, gap_alpha)),
                                 cex = gapsize,
                                 xlim = c(0, 1),
                                 ylim = c(0, 1),
                                 size = pixels)
-
-    }else{
-        bgimage <- gapimage <- NULL
+        if (bg_is_circle){
+            if(all(coords$alpha == 0)){
+                upperimage2 <- scattermore(cbind(coords$x, coords$y),
+                                          rgba = grDevices::col2rgb(alpha = TRUE, scales::alpha(coords$colour, coords$alpha)),
+                                          cex = pointsize,
+                                          xlim = c(0, 1),
+                                          ylim = c(0, 1),
+                                          size = pixels)
+                if (gap_alpha != 0){
+                    bgimage <- .generate_circle_raster(bgimage, gapimage)
+                    gapimage <- .generate_circle_raster(gapimage, upperimage2)
+                }
+            }else{
+                if (gap_alpha != 0){
+                    bgimage <- .generate_circle_raster(bgimage, gapimage)
+                    gapimage <- .generate_circle_raster(gapimage, upperimage)
+                }
+            }
+        }
     }
 
-    ggplot2:::ggname(
+    ggname(
       "geom_scattermore2",
       crasterGrob(
         upperimage, bgimage, gapimage,
