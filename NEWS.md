@@ -1,3 +1,7 @@
+# ggsc 1.1.4
+
++ add background outline of umap plot (2024-04-12, Fri, #22)
+
 # ggsc 1.1.3
 
 + support plotting pie for spatial data (2023-12-13, Wed, #18)
