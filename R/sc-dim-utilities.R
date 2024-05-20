@@ -42,11 +42,11 @@ sc_dim_count <- function(sc_dim_plot) {
     y <- setNames(dd$label, dd$colour)
   } else {
     d2 <- unique(x[, c("colour", "group")])
-    y <- setNames(d2$group -1, d2$colour)
+    y <- setNames(d2$group, d2$colour)
   }
 
   d <- as.data.frame(sort(table(x$colour)))
-  d$group <- y[as.character(d$Var1)]
+  d$group <- y[as.character(d$Var1)] |> as.factor()
   
   rlang::check_installed("forcats", "for sc_dim_count()")
 
@@ -123,7 +123,7 @@ ggplot_add.sc_dim_geom_feature <- function(object, plot, object_name){
                                dims = object$dims, 
                                features = object$features)
     }
-    d <- as_tibble(d, rownames='.ID.NAME')
+    #d <- as_tibble(d, rownames='.ID.NAME')
 
     d <- tidyr::pivot_longer(
            d, 
@@ -131,9 +131,8 @@ ggplot_add.sc_dim_geom_feature <- function(object, plot, object_name){
            names_to = "features"
          ) |> 
          dplyr::select(-c(2, 3, 4)) |>
-         dplyr::left_join(plot$data[,seq_len(3)] |>
-                          tibble::as_tibble(rownames='.ID.NAME'), 
-                          by='.ID.NAME'
+         dplyr::left_join(plot$data[,seq_len(3)],
+                          by='.BarcodeID'
          )
     if (is.numeric(object$features)){
         object$features <- rownames(object$data)[object$features]
@@ -180,11 +179,11 @@ sc_dim_geom_label <- function(geom = ggplot2::geom_text, ...) {
 ##' @method ggplot_add sc_dim_geom_label
 ##' @export
 ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
-    dims <- names(plot$data)[seq_len(2)]
+    dims <- names(plot$data)[seq_len(3)]
     lab.text <- plot$labels$colour
     if (is.null(object$data)) {
         object$data <- dplyr::group_by(plot$data, !!rlang::sym(lab.text)) |> 
-            dplyr::summarize(x=mean(get(dims[1])), y=mean(get(dims[2])))
+            dplyr::summarize(x=mean(get(dims[2])), y=mean(get(dims[3])))
     }
 
     geom <- object$geom
@@ -235,10 +234,10 @@ sc_dim_geom_ellipse <- function(mapping = NULL, level = 0.95, ...) {
 ##' @importFrom ggplot2 stat_ellipse
 ##' @export
 ggplot_add.sc_dim_geom_ellipse <- function(object, plot, object_name) {
-    dims <- names(plot$data)[seq_len(2)]
+    dims <- names(plot$data)[seq_len(3)]
     lab.text <- plot$labels$colour
-    default_mapping <- aes(x = .data[[dims[1]]], 
-                           y = .data[[dims[2]]], 
+    default_mapping <- aes(x = .data[[dims[2]]], 
+                           y = .data[[dims[3]]], 
                            group = !!rlang::sym(lab.text))
     if (is.null(object$mapping)) {
         mapping <- default_mapping
@@ -271,7 +270,7 @@ ggplot_add.sc_dim_geom_ellipse <- function(object, plot, object_name) {
 ##' colLabels(sce) <- clusters
 ##' sce <- runUMAP(sce, assay.type = 'logcounts')
 ##' p1 <- sc_dim(sce, reduction = 'UMAP')
-##' f1 <- p1 + sc_dim_geom_sub(subset = c(1, 2), .column = 'label')
+##' f1 <- p1 + sc_dim_geom_sub(subset = c(1, 2), .column = 'label', bg_colour='black')
 sc_dim_geom_sub <- function(mapping = NULL, subset, .column = "ident", ...) {
   structure(list(mapping = mapping, 
         subset = subset, 

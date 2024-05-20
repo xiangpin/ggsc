@@ -159,7 +159,7 @@ library(STexampleData)
 eh <- ExperimentHub()
 # query STexampleData datasets
 myfiles <- query(eh, "STexampleData")
-spe <- myfiles[["EH7538"]]
+spe <- myfiles[["EH9516"]]
 spe <- spe[, colData(spe)$in_tissue == 1]
 set.seed(123)
 genes <- rownames(spe) |> sample(6) 

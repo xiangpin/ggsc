@@ -58,7 +58,7 @@
 ##' eh <- ExperimentHub()
 ##' # query STexampleData datasets
 ##' myfiles <- query(eh, "STexampleData")
-##' spe <- myfiles[["EH7538"]]
+##' spe <- myfiles[["EH9516"]]
 ##' spe <- spe[, colData(spe)$in_tissue == 1]
 ##' set.seed(123)
 ##' genes <- rownames(spe) |> sample(6) 
@@ -250,10 +250,11 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
                                      cells = NULL, slot = slot, plot.pie = plot.pie, density=density, 
                                      grid.n = grid.n, joint = joint, joint.fun = joint.fun, 
                                      sp.coords = coords.da)
+    rownames(features.da) <- features.da$`.BarcodeID`
+    features.da$`.BarcodeID` <- NULL
 
-    d <- merge(coords.da, features.da, by = 0)
-    rownames(d) <- d$Row.names
-    d$Row.names <- NULL
+    d <- merge(coords.da, features.da, by=0)
+    colnames(d)[1] <- '.BarcodeID'
 
     default_mapping <- aes_string(x = colnames(coords.da)[2], y = colnames(coords.da)[1])
     if (!is.null(features)){
