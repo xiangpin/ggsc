@@ -204,7 +204,8 @@ setMethod("sc_spatial", 'Seurat',
     if (!common.legend && length(features) > 1 && !plot.pie){
         ncol <- min(length(features), ncol)
         p <- .split.by.feature(p, ncol, joint)
-    }    
+    }
+    p <- .add_class(p, "ggsc") 
     return(p)    
 })
 
@@ -340,6 +341,7 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
         ncol <- min(length(features), ncol)
         p <- .split.by.feature(p, ncol, joint)
     }
+    p <- .add_class(p, "ggsc")
     return(p)
 })
 

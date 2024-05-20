@@ -83,6 +83,7 @@ setMethod("sc_dim",
     mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'ident')
 
     p <- sc_dim_internal(d, mapping, ...)
+    p <- .add_class(p, "ggsc")
     return(p)
 })
 
@@ -106,6 +107,7 @@ setMethod('sc_dim', 'SingleCellExperiment',
     mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'label')
 
     p <- sc_dim_internal(d, mapping, ...)
+    p <- .add_class(p, "ggsc")
     return(p)
 
 })

@@ -42,4 +42,11 @@
 }
 
 
-
+.add_class <- function(x, clsnm){
+    old <- class(x)
+    if (clsnm %in% old){
+        return(x)
+    }
+    class(x) <- c(unique(clsnm), union(old))
+    return(x)
+}

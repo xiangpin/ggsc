@@ -126,6 +126,7 @@ setMethod('sc_feature', 'Seurat', function(object, features,
     if (!common.legend && length(features) > 1){
         p <- .split.by.feature(p, ncol)
     }
+    p <- .add_class(p, "ggsc")
     return(p)
 })
 
@@ -195,6 +196,7 @@ setMethod("sc_feature", "SingleCellExperiment",
     if (!common.legend && length(features) > 1){
         p <- .split.by.feature(p, ncol)
     }
+    p <- .add_class(p, "ggsc")
     return(p)    
 })
 
