@@ -47,6 +47,6 @@
     if (clsnm %in% old){
         return(x)
     }
-    class(x) <- c(unique(clsnm), union(old))
+    class(x) <- c(unique(clsnm), unique(old))
     return(x)
 }
