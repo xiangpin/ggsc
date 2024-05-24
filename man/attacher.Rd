@@ -9,8 +9,8 @@ x \%<<+\% y
 \arguments{
 \item{x}{ggsc object, the result of \code{sc_dim}, \code{sc_feature} and \code{sc_spatial}.}
 
-\item{y}{a data.frame, which the first column should be a barcode id, which is similar with
-the x$data$\code{.BarcodeID}. It also can have another column \code{features}.}
+\item{y}{a data.frame, which should have a barcode id column named \code{.BarcodeID},
+it is the same to the x$data$\code{.BarcodeID}. It also can have another column \code{features}.}
 }
 \value{
 ggsc object

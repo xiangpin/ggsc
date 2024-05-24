@@ -23,6 +23,7 @@
    p <- p$data |> dplyr::group_split(.data$features) |>
            lapply(function(i){
               p$data <- i
+              p <- .add_class(p, "ggsc")
               return(p)
             })
 

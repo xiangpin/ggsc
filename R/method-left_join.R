@@ -29,8 +29,8 @@ left_join.ggsc <- function(x, y, by = NULL, copy = FALSE, suffix=c("", ".y"), ..
 #' add the external data frame to the ggsc object.
 #' @rdname attacher
 #' @param x ggsc object, the result of \code{sc_dim}, \code{sc_feature} and \code{sc_spatial}.
-#' @param y a data.frame, which the first column should be a barcode id, which is similar with
-#' the x$data$`.BarcodeID`. It also can have another column \code{features}.
+#' @param y a data.frame, which should have a barcode id column named \code{.BarcodeID},
+#' it is the same to the x$data$`.BarcodeID`. It also can have another column \code{features}.
 #' @export
 #' @return ggsc object
 `%<<+%` <- function(x, y){
@@ -42,6 +42,12 @@ left_join.ggsc <- function(x, y, by = NULL, copy = FALSE, suffix=c("", ".y"), ..
                 "Cannot use {.code <+} with a single argument.",
                 "i" = "Did you accidentally put {.code %<<+%} on a new line?"
         ))
+    }
+    if (inherits(x, 'patchwork')){
+        x$patches$plots <- lapply(x$patches$plots, function(p){
+                                  p <- left_join(p, y)
+                                  return(p)}) |>
+                           suppressMessages()
     }
     x <- left_join(x, y)
     return(x)
