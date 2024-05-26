@@ -5,6 +5,7 @@
 \alias{reexports}
 \alias{aes}
 \alias{theme}
+\alias{\%<+\%}
 \title{Objects exported from other packages}
 \value{
 Depending on the re-exported function
@@ -15,6 +16,8 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
+  \item{ggfun}{\code{\link[ggfun:attacher]{\%<+\%}}}
+
   \item{ggplot2}{\code{\link[ggplot2]{aes}}, \code{\link[ggplot2]{theme}}}
 }}
 
