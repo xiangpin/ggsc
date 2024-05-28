@@ -23,7 +23,7 @@ Imports:
   RcppParallel,
   cli,
   dplyr,
-  ggfun (> 0.1.4),
+  ggfun (>= 0.1.5),
   ggplot2,
   grDevices,
   grid,
