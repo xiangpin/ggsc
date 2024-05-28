@@ -10,3 +10,7 @@ ggplot2::aes
 ##' @importFrom ggplot2 theme
 ##' @export
 ggplot2::theme
+
+##' @importFrom ggfun %<+%
+##' @export
+ggfun::`%<+%`

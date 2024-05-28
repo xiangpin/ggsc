@@ -1,0 +1,69 @@
+#' @title add the annotation layer for ggsc object
+#' @param data The data to be displayed in this layer. There are three
+#' options:
+#'  If \code{NULL}, the default, the data is inherited from the plot
+#'  data as specified in the call to \code{ggplot()}.
+#'  A \code{data.frame}, will override the plot data. the \code{data.frame}
+#'  should have a barcode id or features column.
+#'  A \code{function} will be called with a single argument, the plot
+#'  data. The return value must be a ‘data.frame’, and will be
+#'  used as the layer data. A \code{function} can be created from a
+#'  ‘formula’ (e.g. ‘~ head(.x, 10)’).
+#' @param mapping Set of aesthetic mappings created by \code{aes()}. If specified
+#' and \code{inherit.aes = TRUE} (the default), it is combined with the default 
+#' mapping at the top level of the plot. You must supply \code{mapping} if there is no plot mapping.
+#' @inheritParams geom_scattermore2
+#' @export
+#' @return layer object
+sc_geom_annot <- function(
+     data=NULL, 
+     mapping=NULL,
+     pointsize = 2, 
+     pixels = c(512, 512),
+     gap_colour = "white",
+     gap_alpha = 1,
+     bg_line_width = 0.3,
+     gap_line_width = 0.1,
+     show.legend = NA,
+     na.rm = FALSE,
+     ...
+){
+    params <- list(...)
+    x <- structure(
+      list(data = data, 
+           mapping = mapping, 
+	   pointsize = pointsize,
+           pixels = pixels, 
+           gap_colour = gap_colour,
+           gap_alpha = gap_alpha,
+           bg_line_width = bg_line_width,
+           gap_line_width = gap_line_width,
+           show.legend = show.legend,
+           na.rm = na.rm, 
+           params=params),
+       class = 'sc_geom_annot'
+    )
+    return(x)
+}
+
+#' @importFrom ggplot2 ggplot_add
+#' @method ggplot_add sc_geom_annot
+#' @export
+ggplot_add.sc_geom_annot <- function(object, plot, object_name){
+    object <- .check_layer_data(object, plot)
+    params <- object$params
+    object$params <- NULL
+    ly <- do.call(geom_scattermore2, c(object, params))
+    ggplot_add(ly, plot, object_name)
+}
+
+
+.check_layer_data <- function(object, plot){
+    if (is.data.frame(object$data)){
+        object$data <- plot$data |> 
+             dplyr::left_join(object$data, suffix = c("", ".y")) |> 
+             suppressMessages()
+    }
+    return(object)
+}
+			    

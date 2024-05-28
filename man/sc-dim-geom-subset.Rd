@@ -32,7 +32,7 @@ clusters <- clusterCells(sce, assay.type = 'logcounts')
 colLabels(sce) <- clusters
 sce <- runUMAP(sce, assay.type = 'logcounts')
 p1 <- sc_dim(sce, reduction = 'UMAP')
-f1 <- p1 + sc_dim_geom_sub(subset = c(1, 2), .column = 'label')
+f1 <- p1 + sc_dim_geom_sub(subset = c(1, 2), .column = 'label', bg_colour='black')
 }
 \seealso{
 \link{sc_dim_geom_sub}
