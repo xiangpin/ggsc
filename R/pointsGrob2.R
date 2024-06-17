@@ -52,36 +52,35 @@ grid.craster <- function (image, bg.image, gap.image, x = unit(0.5, "npc"),
 ##' @importFrom grid pointsGrob
 cpointsGrob <- function(x = stats::runif(10), y = stats::runif(10), pch = 1,
     size = unit(1, "char"), bg_line_width = .3, gap_line_width = .1,
-    bg_colour = "black", gap.colour = 'white', default.units = "native",
+    bg_colour = "black", gap_colour = 'white', default.units = "native",
     name = NULL, gp = gpar(), vp = NULL){
 
     upperPointGrob <- pointsGrob(x = x, y = y, pch = pch, size = size,
                                 default.units = default.units, name = name,
                                 gp = gp, vp = vp)
 
-    if (is.null(bg_colour)){
+    if (is.null(bg_colour) || all(is.na(bg_colour))){
         return(upperPointGrob)
     }
 
-    gp.bg <- gp
-    gp.gap <- gp
+    gp_bg <- gp
+    gp_gap <- gp
 
-    gp.bg$col <- bg_colour
-    gp.gap$col <- gap.colour
-
-    gp$fontsize
+    gp_bg$col <- bg_colour
+    gp_gap$col <- gap_colour
 
     tmpsize <- sqrt(gp$fontsize)
-    gp.gap$fontsize <- (tmpsize + tmpsize * gap_line_width * 2)^2
-    gp.bg$fontsize <- gp.gap$fontsize + (sqrt(bg_line_width) + tmpsize * bg_line_width * 2) ^2
-
+    gp_gap_size <- (tmpsize + tmpsize * gap_line_width * 2)^2
+    gp_bg_size <- gp_gap_size + (sqrt(bg_line_width) + tmpsize * bg_line_width * 2) ^2
+    gp_gap$fontsize <- gp_gap_size
+    gp_bg$fontsize <- gp_bg_size
     gapPointGrob <- pointsGrob(x = x, y = y, pch = pch, size = size,
                               default.units = default.units, name = name,
-                              gp = gp.gap, vp = vp)
+                              gp = gp_gap, vp = vp)
 
     bgPointGrob <- pointsGrob(x = x, y = y, pch = pch, size = size,
                              default.units = default.units, name = name,
-                             gp = gp.bg, vp = vp)
+                             gp = gp_bg, vp = vp)
 
     grobs <- gList(bgPointGrob, gapPointGrob, upperPointGrob)
     gTree(children = grobs)
@@ -90,11 +89,11 @@ cpointsGrob <- function(x = stats::runif(10), y = stats::runif(10), pch = 1,
 ##' @importFrom grid grid.draw
 grid.cpoints <- function(x = stats::runif(10), y = stats::runif(10), pch = 1,
     size = unit(1, "char"), bg_line_width = .3, gap_line_width = .1,
-    bg_colour = "black", gap.colour = 'white', default.units = "native",
+    bg_colour = "black", gap_colour = 'white', default.units = "native",
     name = NULL, gp = gpar(), draw = TRUE, vp = NULL){
     pg <- cpointsGrob(x = x, y = y, pch = pch, size = size, bg_line_width = bg_line_width,
                       gap_line_width = gap_line_width, bg_colour = bg_colour,
-                      gap.colour = gap.colour, default.units = default.units, name = name,
+                      gap_colour = gap_colour, default.units = default.units, name = name,
                       gp = gp, vp = vp)
     if (draw) grid.draw(pg)
     invisible(pg)
