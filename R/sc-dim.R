@@ -11,7 +11,7 @@
 ##' other character of geometric layer, such as \code{color}, \code{size},
 ##' \code{alpha} or (\code{shape} when geom = geom_point) can be set manually.
 ##' @param geom the function of geometric layer, default is sc_geom_point,
-##' other geometric layer, such as geom_point also works.
+##' other geometric layer, such as \code{geom_bgpoint} or \code{geom_point} also works.
 ##' @param ... additional parameters pass to \code{geom_scattermore2()}.
 ##' \itemize{
 ##'     \item \code{bg_colour} the colour of background point, default is \code{NA}.
@@ -82,7 +82,7 @@ setMethod("sc_dim",
     
     mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'ident')
 
-    p <- sc_dim_internal(d, mapping, ...)
+    p <- sc_dim_internal(d, mapping, geom = geom, ...)
     p <- .add_class(p, "ggsc")
     return(p)
 })
@@ -106,7 +106,7 @@ setMethod('sc_dim', 'SingleCellExperiment',
     
     mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'label')
 
-    p <- sc_dim_internal(d, mapping, ...)
+    p <- sc_dim_internal(d, mapping, geom = geom, ...)
     p <- .add_class(p, "ggsc")
     return(p)
 

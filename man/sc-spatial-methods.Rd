@@ -29,6 +29,7 @@ sc_spatial(
   joint.fun = prod,
   common.legend = TRUE,
   pointsize = 5,
+  geom = sc_geom_point,
   ...
 )
 
@@ -53,6 +54,7 @@ sc_spatial(
   joint.fun = prod,
   common.legend = TRUE,
   pointsize = 5,
+  geom = sc_geom_point,
   ...
 )
 
@@ -61,13 +63,13 @@ sc_spatial(
   features = NULL,
   sample.id = NULL,
   image.id = NULL,
-  slot = "data",
+  slot = 1,
   plot.pie = FALSE,
   pie.radius.scale = 0.3,
   image.plot = TRUE,
   image.first.operation = "rotate",
   image.rotate.degree = NULL,
-  image.mirror.axis = NULL,
+  image.mirror.axis = "v",
   remove.point = FALSE,
   mapping = NULL,
   ncol = 6,
@@ -77,6 +79,7 @@ sc_spatial(
   joint.fun = prod,
   common.legend = TRUE,
   pointsize = 5,
+  geom = sc_geom_point,
   ...
 )
 }
@@ -131,6 +134,9 @@ default is prod.}
 \code{features}, default is TRUE.}
 
 \item{pointsize}{the size of point, default is 5.}
+
+\item{geom}{the layer of point, default is \code{sc_geom_point}, other option is
+\code{geom_bgpoint}.}
 
 \item{...}{additional parameters, see also \code{geom_scattermore2()}.
 \itemize{
