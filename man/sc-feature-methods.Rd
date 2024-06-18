@@ -22,6 +22,7 @@ sc_feature(
   joint = FALSE,
   joint.fun = prod,
   common.legend = TRUE,
+  geom = sc_geom_point,
   ...
 )
 
@@ -39,6 +40,7 @@ sc_feature(
   joint = FALSE,
   joint.fun = prod,
   common.legend = TRUE,
+  geom = sc_geom_point,
   ...
 )
 
@@ -56,6 +58,7 @@ sc_feature(
   joint = FALSE,
   joint.fun = prod,
   common.legend = TRUE,
+  geom = sc_geom_point,
   ...
 )
 }
@@ -91,6 +94,9 @@ default is prod.}
 
 \item{common.legend}{whether to use \code{facet_wrap} to display the multiple
 \code{features}, default is TRUE.}
+
+\item{geom}{the function of geometric layer, default is sc_geom_point,
+other geometric layer, such as \code{geom_bgpoint} or \code{geom_point} also works.}
 
 \item{...}{additional parameters pass to 'scattermore::geom_scattermore()'
 \itemize{

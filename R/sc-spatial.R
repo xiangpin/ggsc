@@ -31,6 +31,8 @@
 ##' @param common.legend whether to use \code{facet_wrap} to display the multiple
 ##' \code{features}, default is TRUE.
 ##' @param pointsize the size of point, default is 5.
+##' @param geom the layer of point, default is \code{sc_geom_point}, other option is
+##' \code{geom_bgpoint}.
 ##' @param ... additional parameters, see also \code{geom_scattermore2()}.
 ##' \itemize{
 ##'     \item \code{bg_colour} the colour of background point, default is \code{NA}.
@@ -88,6 +90,7 @@ setGeneric('sc_spatial', function(object,
                                   joint.fun = prod,
                                   common.legend = TRUE,
                                   pointsize = 5,
+				  geom = sc_geom_point,
                                   ...) 
            standardGeneric('sc_spatial')
 )
@@ -103,7 +106,9 @@ setMethod("sc_spatial", 'Seurat',
                    image.rotate.degree = NULL, image.mirror.axis = 'v', 
                    remove.point = FALSE, mapping = NULL, ncol = 6, 
                    density=FALSE, grid.n = 100, joint = FALSE, 
-                   joint.fun = prod, common.legend = TRUE, pointsize = 5, ...) {
+                   joint.fun = prod, common.legend = TRUE, pointsize = 5, 
+                   geom = sc_geom_point,
+                   ...) {
     images <- SeuratObject::Images(object = object, 
                     assay = Seurat::DefaultAssay(object = object)
                 )
@@ -174,7 +179,10 @@ setMethod("sc_spatial", 'Seurat',
     }
 
     if ((!remove.point && (!is.null(features) || (any(names(mapping) %in% c('color', 'colour')) && is.null(features))) && !plot.pie)){
-        p <- p + sc_geom_point(pointsize = pointsize, ...)
+        params <- list(...)
+        params$pointsize <- pointsize
+        pointlayer <- do.call(geom, params)
+        p <- p + pointlayer
     }else if (!remove.point && plot.pie){
         rlang::check_installed('scatterpie', 'is required when `plot.pie=TRUE`')
         p <- p + scatterpie::geom_scatterpie(data=d, mapping=mapping, cols='features', long_format=TRUE, pie_scale=pie.radius.scale, ...)
@@ -234,6 +242,8 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
                                                          joint = FALSE,
                                                          joint.fun = prod,
                                                          common.legend = TRUE,
+                                                         pointsize = 5,
+                                                         geom = sc_geom_point,
                                                          ...
                                                         ){
     if (!"imgData" %in% names(int_metadata(object))){
@@ -311,7 +321,10 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
     }
 
     if ((!remove.point && (!is.null(features) || (any(names(mapping) %in% c('color', 'colour')) && is.null(features))) && !plot.pie)){
-        p <- p + sc_geom_point(pointsize = pointsize, ...) 
+        params <- list(...)
+        params$pointsize <- pointsize
+        pointlayer <- do.call(geom, params)
+        p <- p + pointlayer
     }else if (!remove.point && plot.pie){
         rlang::check_installed('scatterpie', 'is required when `plot.pie=TRUE`')
         p <- p + scatterpie::geom_scatterpie(data=d, mapping=mapping, cols='features', long_format=TRUE, pie_scale = pie.radius.scale, ...)

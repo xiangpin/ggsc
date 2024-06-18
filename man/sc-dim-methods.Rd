@@ -59,7 +59,7 @@ other character of geometric layer, such as \code{color}, \code{size},
 \code{alpha} or (\code{shape} when geom = geom_point) can be set manually.}
 
 \item{geom}{the function of geometric layer, default is sc_geom_point,
-other geometric layer, such as geom_point also works.}
+other geometric layer, such as \code{geom_bgpoint} or \code{geom_point} also works.}
 
 \item{...}{additional parameters pass to \code{geom_scattermore2()}.
 \itemize{

@@ -8,24 +8,36 @@
 #' @param params A list of additional parameters supplied to the geom.
 #' @param size Width and height of key in mm.
 #' @return A grid grob.
-#' @name draw_key_scattermore2
+#' @name draw_key_bgpoint
 #' @export
 #' @importFrom scales alpha
 #' @importFrom ggplot2 draw_key_point
 #' @importFrom grid grobTree pointsGrob
-draw_key_scattermore2 <- function(data, params, size){
-    pointkey <- draw_key_point(data, params, size)
-    if (is.null(data$bg_colour)){
-        return (pointkey)
-    }
-    
-    stroke_size <- data$stroke %||% 0.5
-    stroke_size[is.na(stroke_size)] <- 0
+#' @importFrom ggplot2 fill_alpha
+#' @export
+draw_key_bgpoint <- function(data, params, size){
+  if (is.null(data$shape)) {
+    data$shape <- 19
+  } else if (is.character(data$shape)) {
+    data$shape <- translate_shape_string(data$shape)
+  }
 
-    gp <- gpar(col = data$bg_colour, 
-               fontsize = (data$size %||% 1.5) * .pt + stroke_size * .stroke / 2,
-               lwd = (data$stroke %||% 0.5) * 4)
-    grobTree(pointkey, pointsGrob(0.5, 0.5, pch = 21, gp = gp))
+  # NULL means the default stroke size, and NA means no stroke.
+  stroke_size <- data$stroke %||% 0.5
+  stroke_size[is.na(stroke_size)] <- 0
+  cpointsGrob(0.5, 0.5,
+    pch = data$shape,
+    bg_colour = data$bg_colour,
+    gap_colour = alpha(params$gap_colour %||% "black", params$gap_alpha),
+    bg_line_width = params$bg_line_width,
+    gap_line_width = params$gap_line_width,
+    gp = gpar(
+      col = alpha(data$colour %||% "black", data$alpha),
+      fill = fill_alpha(data$fill %||% "black", data$alpha),
+      fontsize = (data$size %||% 1.5) * .pt + stroke_size * .stroke / 2,
+      lwd = stroke_size * .stroke / 2
+    )
+  )    
 }
 
 .pt <- 2.845276

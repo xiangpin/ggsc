@@ -19,6 +19,8 @@
 ##' default is prod.
 ##' @param common.legend whether to use \code{facet_wrap} to display the multiple 
 ##' \code{features}, default is TRUE.
+##' @param geom the function of geometric layer, default is sc_geom_point,
+##' other geometric layer, such as \code{geom_bgpoint} or \code{geom_point} also works.
 ##' @param ... additional parameters pass to 'scattermore::geom_scattermore()'
 ##' \itemize{
 ##'     \item \code{bg_colour} the colour of background point, default is \code{NA}.
@@ -75,6 +77,7 @@ setGeneric('sc_feature', function(object,
                                   joint = FALSE,
                                   joint.fun = prod,
                                   common.legend = TRUE,
+                                  geom = sc_geom_point,
                                   ...)
     standardGeneric('sc_feature')
 )
@@ -86,7 +89,7 @@ setMethod('sc_feature', 'Seurat', function(object, features,
                     dims=c(1,2), reduction=NULL, 
                     cells=NULL, slot = "data", mapping=NULL, 
                     ncol=3, density = FALSE, grid.n = 100, joint = FALSE,
-                    joint.fun = prod, common.legend = TRUE, ...) {
+                    joint.fun = prod, common.legend = TRUE, geom = sc_geom_point, ...) {
     d <- get_dim_data(object = object, features = features,
                     dims = dims, reduction = reduction, 
                     cells = cells, slot = slot, density = density, 
@@ -117,7 +120,7 @@ setMethod('sc_feature', 'Seurat', function(object, features,
         mapping <- modifyList(default_mapping, mapping)
     }
 
-    p <- sc_dim_internal(d2, mapping, ...) +
+    p <- sc_dim_internal(d2, mapping, geom = geom, ...) +
         scale_color_gradient(low='grey', high='blue')           
         #scale_color_gradient2(low='blue', mid='grey', high='red') + 
 
@@ -137,7 +140,7 @@ setMethod("sc_feature", "SingleCellExperiment",
           function(object, features, dims = c(1, 2), reduction = NULL, 
                    cells = NULL, slot = 'data', mapping = NULL, ncol = 3, 
                    density = FALSE, grid.n = 100, joint = FALSE, 
-                   joint.fun = prod, common.legend = TRUE, ...){
+                   joint.fun = prod, common.legend = TRUE, geom = sc_geom_point, ...){
     if (slot == 'data'){
         if ('logcounts' %in% assayNames(object)){
             slot <- 'logcounts'
@@ -187,7 +190,7 @@ setMethod("sc_feature", "SingleCellExperiment",
         mapping <- modifyList(default_mapping, mapping)
     }
 
-    p <- sc_dim_internal(d2, mapping, ...) +
+    p <- sc_dim_internal(d2, mapping, geom = geom, ...) +
         scale_color_gradient(low='grey', high='blue')
         #scale_color_gradient2(low='blue', mid='grey', high='red') +
 
