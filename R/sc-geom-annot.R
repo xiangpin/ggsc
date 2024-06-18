@@ -54,6 +54,11 @@ ggplot_add.sc_geom_annot <- function(object, plot, object_name){
     params <- object$params
     object$params <- NULL
     geomfun <- .extract_geom_name(plot)
+    if (geomfun == 'geom_scattermore2'){
+        geomfun <- "sc_geom_point"
+    }else{
+        params$pixels <- NULL
+    }
     ly <- do.call(geomfun, c(object, params))
     ggplot_add(ly, plot, object_name)
 }
@@ -74,8 +79,9 @@ ggplot_add.sc_geom_annot <- function(object, plot, object_name){
         ind <- 2
     }
     lay <- plot$layers[[ind]]
-    geomfun <- snakeize(class(lay$geom))[[1]]
-    return(geomfun)
+    x <- snakeize(class(lay$geom))[[1]]
+    x <- gsub("new_","", x)
+    return(x)
 }
 
 # this is from the internal function of ggplot2

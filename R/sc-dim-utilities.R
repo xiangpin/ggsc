@@ -142,7 +142,11 @@ ggplot_add.sc_dim_geom_feature <- function(object, plot, object_name){
     sc.point.params <- object$params
     sc.point.params$data <- d
     geomfun <- .extract_geom_name(plot)
-    if (geomfun == 'geom_scattermore2'){geomfun <- "sc_geom_point"}
+    if (geomfun == 'geom_scattermore2'){
+        geomfun <- "sc_geom_point"
+    }else{
+        sc.point.params$pixels <- NULL
+    }    
     p <- do.call(geomfun, sc.point.params)
     ly <- list(p,
         .feature_setting(features=object$features, ncol=object$ncol)
@@ -296,7 +300,11 @@ ggplot_add.dim_geom_sub <- function(object, plot, object_name) {
   object$subset <- NULL
   object$.column <- NULL
   geomfun <- .extract_geom_name(plot)
-  if (geomfun == 'geom_scattermore2'){geomfun <- "sc_geom_point"}  
+  if (geomfun == 'geom_scattermore2'){
+      geomfun <- "sc_geom_point"
+  }else{
+      object$pixels <- NULL
+  }
   ly <- do.call(geomfun, object)
   ggplot_add(ly, plot, object_name)
 }
