@@ -5,7 +5,7 @@
    }
    lims <- c(range(coords[,1]), range(coords[,2]))
    h <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
-   res <- CalWkdeCpp(x=as.matrix(coords), w=w, l=lims, h = h, n = n)
+   res <- CalWkdeCpp(x=as.matrix(coords[,seq(2),drop=FALSE]), w=w, l=lims, h = h, n = n)
    colnames(res) <- rownames(w)
    rownames(res) <- colnames(w)
    if (joint && !is.null(joint.fun)){
