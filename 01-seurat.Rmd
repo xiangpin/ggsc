@@ -95,10 +95,10 @@ plot_list(p, p2, widths=c(1, .5))
 library(dplyr)
 
 top20 <- pbmc.markers |>
-    group_by(cluster) |>
-    filter(avg_log2FC > 1) |>
-    slice_head(n = 20) |>
-    ungroup()
+    dplyr::group_by(cluster) |>
+    dplyr::filter(avg_log2FC > 1) |>
+    dplyr::slice_head(n = 20) |>
+    dplyr::ungroup()
 
 library(clusterProfiler)
 library(enrichplot)
