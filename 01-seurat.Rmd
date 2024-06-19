@@ -157,8 +157,8 @@ sc_dim(pbmc, alpha=.3) +
     sc_dim_geom_feature(pbmc, features, mapping=aes(color=features)) +
     scale_color_viridis_d()
 
-sc_dim(pbmc) +
-    sc_dim_geom_feature(pbmc, 'CD4', color='black')
+sc_dim(pbmc, geom = geom_bgpoint) +
+    sc_dim_geom_feature(pbmc, 'CD4', bg_colour = 'grey')
 
 sc_dim(pbmc, alpha=.3) +
     ggnewscale::new_scale_color() +
@@ -185,8 +185,8 @@ f2 <- sc_feature(pbmc, features = 'CD3E',
                  geom = geom_bgpoint, 
                  density = TRUE,
                  bg_line_width = .4,
-                 gap_line_width = .2,
-                 size = .5) + 
+                 gap_line_width = .22,
+                 size = .8) + 
 		 scale_color_viridis_c()
 
 f1 | f2
@@ -208,8 +208,8 @@ sc_dim(pbmc) +
 ```
 
 ```{r dim-sub-label}
-sc_dim(pbmc, color='grey') + 
-  sc_dim_geom_sub(subset=selected) + 
+sc_dim(pbmc, color='grey', geom = geom_bgpoint, pointsize=1) + 
+  sc_dim_geom_sub(subset=selected, mapping = aes(bg_colour = ident)) + 
     sc_dim_geom_label(geom = shadowtext::geom_shadowtext, 
           mapping = aes(subset = ident %in% selected),
             color='black', bg.color='white')
@@ -281,6 +281,10 @@ spe.brain
 library(SVP)
 res.lisa1 <- runLISA(spe.brain, features = c("Hpca", "Ttr"), assay.type = 'logcounts', weight.method='knn', k=20)
 da.lisa1 <- res.lisa1 |> lapply(function(x)x |> tibble::rownames_to_column(var='.BarcodeID')) |> dplyr::bind_rows(.id='features')
+head(da.lisa1)
+# The features and .BarcodeID must be provided
+# which be the same to the .BarcodeID and features of 
+# f1$data
 f1 + sc_geom_annot(
         data=da.lisa1, 
         mapping = aes(bg_color=cluster.test, subset=cluster.test=='High'), 
@@ -294,7 +298,8 @@ f2 + sc_geom_annot(
 	mapping = aes(bg_colour = cluster.test, subset = cluster.test == 'High'),
 	pointsize = 1.5,
         bg_line_width = .3,
-	gap_line_width = .3) 
+	gap_line_width = .3) +
+	scale_bg_colour_manual(values = 'black')
 ```
 
 
@@ -313,7 +318,9 @@ plot_list(f3, f4, ncol=1)
 ```{r sc_spatial-pie}
 genes <- rownames(brain) |> sample(10)
 sc_spatial(brain, features=genes, plot.pie=TRUE, 
-        pie.radius.scale=.35, image.plot=FALSE)
+        pie.radius.scale=.35, image.plot=FALSE,
+        color = NA
+	)
 ```
 
 
