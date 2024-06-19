@@ -53,7 +53,13 @@ ggplot_add.sc_geom_annot <- function(object, plot, object_name){
     object <- .check_layer_data(object, plot)
     params <- object$params
     object$params <- NULL
-    ly <- do.call(geom_scattermore2, c(object, params))
+    geomfun <- .extract_geom_name(plot)
+    if (geomfun == 'geom_scattermore2'){
+        geomfun <- "sc_geom_point"
+    }else{
+        params$pixels <- NULL
+    }
+    ly <- do.call(geomfun, c(object, params))
     ggplot_add(ly, plot, object_name)
 }
 
@@ -66,4 +72,28 @@ ggplot_add.sc_geom_annot <- function(object, plot, object_name){
     }
     return(object)
 }
-			    
+
+.extract_geom_name <- function(plot){
+    ind <- 1
+    if (length(plot$layers)>1){
+        ind <- 2
+    }
+    lay <- plot$layers[[ind]]
+    x <- snakeize(class(lay$geom))[[1]]
+    x <- gsub("new_","", x)
+    return(x)
+}
+
+# this is from the internal function of ggplot2
+snakeize <- function(x){
+    x <- gsub("([A-Za-z])([A-Z])([a-z])", "\\1_\\2\\3", x)
+    x <- gsub(".", "_", x, fixed = TRUE)
+    x <- gsub("([a-z])([A-Z])", "\\1_\\2", x)
+    to_lower_ascii(x)
+}
+
+upper_ascii <- "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+lower_ascii <- "abcdefghijklmnopqrstuvwxyz"
+to_lower_ascii <- function(x){
+   chartr(upper_ascii, lower_ascii, x)
+}
