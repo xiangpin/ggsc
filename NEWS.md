@@ -1,3 +1,7 @@
+# ggsc 1.1.4.001
+
++ add `geom_bgpoint()` layer (2024-06-18, Tue, #24)
+
 # ggsc 1.1.4
 
 + add background outline of umap plot (2024-04-12, Fri, #22)
