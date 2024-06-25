@@ -1,6 +1,10 @@
-# ggsc 1.1.4.001
+# ggsc 1.3.001
 
 + add `geom_bgpoint()` layer (2024-06-18, Tue, #24)
+
+# ggsc 1.2.0
+
++ Bioconductor RELEASE_3_19 (2024-05-01, Wed)
 
 # ggsc 1.1.4
 
