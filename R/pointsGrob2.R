@@ -59,7 +59,7 @@ cpointsGrob <- function(x = stats::runif(10), y = stats::runif(10), pch = 1,
                                 default.units = default.units, name = name,
                                 gp = gp, vp = vp)
 
-    if (is.null(bg_colour) || all(is.na(bg_colour))){
+    if (all(is.null(bg_colour)) || all(is.na(bg_colour))){
         return(upperPointGrob)
     }
 
