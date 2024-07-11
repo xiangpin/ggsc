@@ -33,8 +33,7 @@
             }
         }
 
-        tmp <- assay(object, slot)
-        tmp <- tmp[features, ,drop=FALSE]
+        tmp <- .FetchDataFromSCE(object, features, assay.type=slot)
 
         if (density && !is.null(reduced.dat) && !plot.pie){
           tmp <- .buildWkde(w = tmp, coords = reduced.dat, n = grid.n,
@@ -48,7 +47,7 @@
                  t() |>
                  as.data.frame(check.names=FALSE)
         }
-        xx <- cbind(xx, tmp)
+        xx <- cbind(xx[,!colnames(xx) %in% colnames(tmp),drop=FALSE], tmp)
     }
     xx <- cbind(data.frame(.BarcodeID=rownames(xx)), xx)
     return(xx)
@@ -84,6 +83,7 @@ get_dim_data <- function(object, features = NULL,
             features <- rownames(object)[features]
         }
         tmp <- SeuratObject::FetchData(object, vars = features, cells = cells, slot = slot)
+        xx <- xx[, !colnames(xx) %in% colnames(tmp),drop=FALSE]
         if (density && !is.null(reduced.dat) && !plot.pie){
             tmp <- .buildWkde(t(tmp), reduced.dat, grid.n, joint, joint.fun)
             xx <- cbind(reduced.dat, xx, tmp)
@@ -102,4 +102,59 @@ get_dim_data <- function(object, features = NULL,
     }
     xx <- cbind(data.frame(.BarcodeID=rownames(xx)), xx)
     return(xx)
+}
+
+
+.FetchDataFromSCE <- function(x, features, assay.type = 1){
+    if (is.numeric(features)){
+        features <- features[features <= nrow(x)]
+        features <- rownames(x)[features]
+    }
+    f1 <- intersect(features, rownames(x))
+    y <- NULL
+    if (length(f1) > 0){
+        y <- assay(x, assay.type)[f1, ,drop=FALSE]
+    }
+
+    features <- setdiff(features, rownames(x))
+    if (length(features)==0){
+        if (is.null(y)){
+        cli::cli_abort("The {.var features} is/are not in the {.cls class(x)}.")
+        }else{
+            return(y)
+        }
+    }
+
+    meta.data <- colData(x) |>
+                 as.data.frame(check.names=FALSE) |>
+                 suppressWarnings()
+
+    nm2 <- lapply(seq(ncol(meta.data)), function(x)is.numeric(meta.data[,x])) |>
+        unlist()  
+    nm2 <- colnames(meta.data)[nm2]
+    
+    f2 <- intersect(features, nm2)
+    if (length(f2) > 0){
+        y2 <- meta.data[,f2,drop=FALSE] |> t()
+        y <- rbind(y, y2)
+    }
+
+    features <- setdiff(features, nm2)
+
+    if (length(features) == 0){
+        return(y)
+    }
+
+    rds <- reducedDims(x)
+    rdsnm <- lapply(rds, colnames) 
+    f3 <- intersect(features, unlist(rdsnm))
+    
+    if (length(f3) > 0){
+        ind1 <- lapply(rdsnm, function(x) f3 %in% x)
+        ind2 <- lapply(ind1, any) |> unlist()
+        y3 <- lapply(rds[ind2], function(x)x[,colnames(x) %in% f3,drop=FALSE])
+        y3 <- do.call('cbind', y3) |> t()
+        y <- rbind(y, y3)
+    }
+    return(y)
 }
