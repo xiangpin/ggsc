@@ -174,5 +174,9 @@ p <- sc_spatial(spe, features = genes,
                 image.rotate.degree = -90, 
                 image.mirror.axis = NULL, 
                 ncol = 3)
+# The features also can be specified 
+# the variables from colData or reducedDims.
+p1 <- sc_spatial(spe, features = 'cell_count', 
+                 image.rotate.degree = -90, image.mirror.axis = NULL)
 }
 }
