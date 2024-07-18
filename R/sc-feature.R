@@ -64,6 +64,10 @@
 ##'     sc_dim_geom_feature(sce, genes, mapping=aes(color=features)) +
 ##'     scale_color_viridis_d()
 ##' p1 + p2 + f1 + f2
+##' # The features can also be specified the variables from
+##' # colData or reducedDims
+##' pp <- sc_feature(sce, features = 'sizeFactor', reduction='TSNE', geom=geom_bgpoint)
+##' pp
 setGeneric('sc_feature', function(object, 
                                   features, 
                                   dims = c(1, 2), 
@@ -90,6 +94,9 @@ setMethod('sc_feature', 'Seurat', function(object, features,
                     cells=NULL, slot = "data", mapping=NULL, 
                     ncol=3, density = FALSE, grid.n = 100, joint = FALSE,
                     joint.fun = prod, common.legend = TRUE, geom = sc_geom_point, ...) {
+    if (is.numeric(features)){
+       features <- rownames(object)[features]
+    }
     d <- get_dim_data(object = object, features = features,
                     dims = dims, reduction = reduction, 
                     cells = cells, slot = slot, density = density, 
@@ -104,6 +111,10 @@ setMethod('sc_feature', 'Seurat', function(object, features,
         }
     }else{
         valnm <- slot
+    }
+
+    if (!all(features %in% rownames(object))){
+        valnm <- "data"
     }
 
     indx.f <- seq(ncol(d)-nm.f + 1, ncol(d))
@@ -148,6 +159,10 @@ setMethod("sc_feature", "SingleCellExperiment",
             slot <- 1
         }
     }
+
+    if (is.numeric(features)){
+        features <- rownames(object)[features]
+    }
               
     d <- .extract_sce_data(object = object, features = features, dims = dims, 
                            reduction = reduction, cells = cells, slot = slot,
@@ -168,6 +183,10 @@ setMethod("sc_feature", "SingleCellExperiment",
            slot <- assayNames(object)[slot]
        }
        valnm <- slot
+    }
+
+    if (!all(features %in% rownames(object))){
+       valnm <- "data"
     }
 
     indx.f <- seq(ncol(d) - nm.f + 1, ncol(d))

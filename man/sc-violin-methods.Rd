@@ -16,6 +16,7 @@ sc_violin(
   .fun = NULL,
   mapping = NULL,
   ncol = 3,
+  geom = geom_violin,
   ...
 )
 
@@ -27,6 +28,7 @@ sc_violin(
   .fun = NULL,
   mapping = NULL,
   ncol = 3,
+  geom = geom_violin,
   ...
 )
 
@@ -38,6 +40,7 @@ sc_violin(
   .fun = NULL,
   mapping = NULL,
   ncol = 3,
+  geom = geom_violin,
   ...
 )
 }
@@ -55,6 +58,8 @@ sc_violin(
 \item{mapping}{aesthetic mapping}
 
 \item{ncol}{number of facet columns if 'length(features) > 1'}
+
+\item{geom}{the geom function, default is geom_violin, other option is geom_boxplot}
 
 \item{...}{additional parameters pass to 'ggplot2::geom_geom_violin()'}
 }

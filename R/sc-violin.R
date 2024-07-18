@@ -7,6 +7,7 @@
 ##' @param .fun user defined function that will be applied to selected features (default is NULL and there is no data operation)
 ##' @param mapping aesthetic mapping
 ##' @param ncol number of facet columns if 'length(features) > 1'
+##' @param geom the geom function, default is geom_violin, other option is geom_boxplot
 ##' @param ... additional parameters pass to 'ggplot2::geom_geom_violin()'
 ##' @return violin plot to visualize feature expression distribution
 ##' @seealso
@@ -38,7 +39,9 @@
 ##' sc_violin(sce, genes, slot = 'logcounts') +
 ##'   theme(axis.text.x = element_text(angle=45, hjust=1))
 setGeneric('sc_violin', function(object, features, cells=NULL, 
-                                 slot = "data", .fun = NULL, mapping = NULL, ncol=3, ...)
+                                 slot = "data", .fun = NULL, 
+                                 mapping = NULL, ncol=3, 
+                                 geom = geom_violin, ...)
     standardGeneric('sc_violin')
 )
 
@@ -47,8 +50,8 @@ setGeneric('sc_violin', function(object, features, cells=NULL,
 ##' @exportMethod sc_violin
 setMethod("sc_violin", 'Seurat', function(object, features, 
                     cells=NULL, slot = "data", .fun = NULL, 
-                    mapping = NULL, ncol=3, ...) {
-    d <- get_dim_data(object, dims=NULL, features=features)
+                    mapping = NULL, ncol=3, geom = geom_violin, ...) {
+    d <- get_dim_data(object, dims=NULL, features=features, slot=slot)
     indx.f <- seq(ncol(d) - length(features) + 1, ncol(d))
     d <- tidyr::pivot_longer(d, cols=indx.f, names_to = "features") 
     d$features <- factor(d$features, levels = features)
@@ -61,11 +64,11 @@ setMethod("sc_violin", 'Seurat', function(object, features,
     mapping <- .add_aes(mapping, object, d, prefix = c('ident', 'value'), aes.character = c('x', 'y'))
 
     p <- ggplot(d, mapping) + 
-        geom_violin(...) #+ 
+        geom(...) #+ 
         #ggforce::geom_sina(size=.1)
     
     if (length(features) > 1) {
-        p <- p + facet_wrap(~features, ncol=ncol)
+        p <- p + facet_wrap(~features, ncol=ncol, scales='free')
     }
     return(p)
 })
@@ -76,9 +79,9 @@ setMethod("sc_violin", 'Seurat', function(object, features,
 setMethod('sc_violin', 'SingleCellExperiment', 
           function(
              object, features, cells = NULL, slot = 'data', 
-             .fun = NULL, mapping = NULL, ncol = 3, ...){
+             .fun = NULL, mapping = NULL, ncol = 3, geom = geom_violin, ...){
 
-    d <- .extract_sce_data(object, dims = NULL, features = features)
+    d <- .extract_sce_data(object, dims = NULL, features = features, slot=slot)
     
     d <- tidyr::pivot_longer(d, seq(ncol(d) - length(features) + 1, ncol(d)), names_to = "features")
 
@@ -96,11 +99,11 @@ setMethod('sc_violin', 'SingleCellExperiment',
     mapping <- .add_aes(mapping, object, d, prefix = c('label', 'value'), aes.character = c('x', 'y'))
     
     p <- ggplot(d, mapping) +
-        geom_violin(...) #+
+        geom(...) #+
         #ggforce::geom_sina(size=.1)
 
     if (length(features) > 1) {
-        p <- p + facet_wrap(~features, ncol=ncol)
+        p <- p + facet_wrap(~features, ncol=ncol, scales = 'free')
     }
     return(p)    
 

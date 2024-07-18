@@ -188,7 +188,7 @@ GeomScattermore2 <- ggplot2::ggproto("GeomScattermore2", ggplot2::Geom,
                               ylim = c(0, 1),
                               size = pixels)
 
-    if (!all(is.null(coords$bg_colour)) || !all(is.na(coords$bg_colour))){
+    if (!all(is.null(coords$bg_colour)) && !all(is.na(coords$bg_colour))){
         tmpsize <- sqrt(pointsize)
         gapsize <- (tmpsize + tmpsize * gap_line_width * 2)^2
         bgsize <- gapsize + (sqrt(bg_line_width) + tmpsize * bg_line_width * 2) ^2

@@ -139,4 +139,8 @@ f2 <- sc_dim(sce, alpha=.3, slot='logcounts', reduction = 'TSNE') +
     sc_dim_geom_feature(sce, genes, mapping=aes(color=features)) +
     scale_color_viridis_d()
 p1 + p2 + f1 + f2
+# The features can also be specified the variables from
+# colData or reducedDims
+pp <- sc_feature(sce, features = 'sizeFactor', reduction='TSNE', geom=geom_bgpoint)
+pp
 }

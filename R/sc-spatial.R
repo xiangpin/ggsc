@@ -69,6 +69,10 @@
 ##'                 image.rotate.degree = -90, 
 ##'                 image.mirror.axis = NULL, 
 ##'                 ncol = 3)
+##' # The features also can be specified 
+##' # the variables from colData or reducedDims.
+##' p1 <- sc_spatial(spe, features = 'cell_count', 
+##'                  image.rotate.degree = -90, image.mirror.axis = NULL)
 ##' }
 setGeneric('sc_spatial', function(object, 
                                   features = NULL, 
@@ -116,7 +120,10 @@ setMethod("sc_spatial", 'Seurat',
     if (!is.null(img)) img <- as.raster(img)
     
     coords.da <- SeuratObject::GetTissueCoordinates(object = object[[images]])
-    
+    if (is.numeric(features)){
+        features <- rownames(object)[features]
+    }
+
     d <- get_dim_data(object = object, features = features, dims = NULL, 
                       density = density, grid.n = grid.n, joint = joint,
                       joint.fun = joint.fun, sp.coords=coords.da)
@@ -131,6 +138,9 @@ setMethod("sc_spatial", 'Seurat',
        }
     }else{
        valnm <- slot
+    }
+    if (!all(features %in% rownames(object))){
+       valnm <- "data"
     }
     d <- cbind(coords.da, d)
 
@@ -286,6 +296,10 @@ setMethod('sc_spatial', 'SingleCellExperiment', function(object,
            }
            valnm <- slot
         }
+
+	if (!all(features %in% rownames(object))){
+	   valnm <- 'data'
+	}
 
         indx.f <- seq(ncol(d)- nm.f + 1, ncol(d))
         features <- colnames(d)[indx.f]
