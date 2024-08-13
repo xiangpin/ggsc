@@ -79,7 +79,6 @@ setMethod("sc_dim",
     d <- get_dim_data(object = object, features = NULL,
                     dims = dims, reduction = reduction, 
                     cells = cells, slot = slot)
-    
     mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'ident')
 
     p <- sc_dim_internal(d, mapping, geom = geom, ...)
@@ -103,23 +102,28 @@ setMethod('sc_dim', 'SingleCellExperiment',
   {
     d <- .extract_sce_data(object = object, features = NULL, dims = dims, 
                       reduction = reduction, cells = cells, slot = slot)
-    
+
     mapping <- .check_aes_mapping(object, mapping, data = d, prefix = 'label')
 
     p <- sc_dim_internal(d, mapping, geom = geom, ...)
     p <- .add_class(p, "ggsc")
     return(p)
-
 })
 
 ##' @importFrom tidydr theme_dr
 sc_dim_internal <- function(data, mapping, geom = sc_geom_point, ...) {
-    dims <- names(data)[seq_len(3)]
-    p <- ggplot(data, aes(.data[[dims[2]]], .data[[dims[3]]]))
+    default_mapping <- .set_default_mapping(data)
+    mapping <- modifyList(default_mapping, mapping)
+    p <- ggplot(data, mapping)
     params <- list(...)
-    params$mapping <- mapping
     layers <- do.call(geom, params)
     p <- p + layers + theme_dr()
     return(p)
 } 
 
+
+.set_default_mapping <- function(data){
+    dims <- names(data)[seq_len(3)]
+    x <- aes(x=!!rlang::sym(dims[2]), y=!!rlang::sym(dims[3]))
+    return(x)
+}

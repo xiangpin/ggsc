@@ -188,13 +188,15 @@ ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
     dims <- names(plot$data)[seq_len(3)]
     lab.text <- plot$labels$colour
     if (is.null(object$data)) {
-        object$data <- dplyr::group_by(plot$data, !!rlang::sym(lab.text)) |> 
-            dplyr::summarize(x=mean(get(dims[2])), y=mean(get(dims[3])))
+        object$data <- split(plot$data, plot$data[[lab.text]]) |> 
+            lapply(function(x).calculate_ellipse(x, vars = dims[c(2, 3)], level=object$level)) |>
+            dplyr::bind_rows(.id=lab.text) 
+        object$level <- NULL
     }
 
     geom <- object$geom
     object$geom <- NULL
-    default_mapping <- aes(x=.data$x, y = .data$y, label = !!rlang::sym(lab.text))
+    default_mapping <- aes(x=!!rlang::sym(dims[2]), y = !!rlang::sym(dims[3]), label = !!rlang::sym(lab.text))
     if (is.null(object$mapping)) {
         object$mapping <- default_mapping
     } else {
@@ -242,8 +244,8 @@ sc_dim_geom_ellipse <- function(mapping = NULL, level = 0.95, ...) {
 ggplot_add.sc_dim_geom_ellipse <- function(object, plot, object_name) {
     dims <- names(plot$data)[seq_len(3)]
     lab.text <- plot$labels$colour
-    default_mapping <- aes(x = .data[[dims[2]]], 
-                           y = .data[[dims[3]]], 
+    default_mapping <- aes(x = !!rlang::sym(dims[2]), 
+                           y = !!rlang::sym(dims[3]), 
                            group = !!rlang::sym(lab.text))
     if (is.null(object$mapping)) {
         mapping <- default_mapping
