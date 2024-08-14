@@ -130,7 +130,7 @@ ggplot_add.sc_dim_geom_feature <- function(object, plot, object_name){
            seq(ncol(d) - length(object$features) + 1, ncol(d)), 
            names_to = "features"
          ) |> 
-         dplyr::select(-c(2, 3, 4)) |>
+         dplyr::select(-c(2, 3)) |>
          dplyr::left_join(plot$data[,seq_len(3)],
                           by='.BarcodeID'
          )
