@@ -74,7 +74,7 @@ subset_cell <- function(x, feature = "nFeature_RNA", method = 'mad', n = 3) {
     x[, idx]
 }
 
-
+#' @importFrom stats mad median quantile sd
 subset_cell_internal <- function(x, feature = "nFeature_RNA", method = 'mad', n = 3) {
     md <- x[[]]
     y <- md[[feature]]
