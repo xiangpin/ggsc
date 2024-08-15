@@ -186,12 +186,20 @@ sc_dim_geom_label <- function(geom = ggplot2::geom_text, ...) {
 ##' @export
 ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
     dims <- names(plot$data)[seq_len(3)]
-    lab.text <- plot$labels$colour
-    if (is.null(object$data)) {
+    if (!is.null(object$mapping$label)){
+        lab.text <- ggfun::get_aes_var(object$mapping, 'label')
+        object$mapping$label <- NULL
+    }else{
+        lab.text <- plot$labels$colour
+    }
+    flag1 <- lab.text %in% colnames(plot$data) && !is.numeric(plot$data[[lab.text]]) 
+    if (is.null(object$data) && flag1) {
         object$data <- split(plot$data, plot$data[[lab.text]]) |> 
             lapply(function(x).calculate_ellipse(x, vars = dims[c(2, 3)], level=object$level)) |>
             dplyr::bind_rows(.id=lab.text) 
         object$level <- NULL
+    }else{
+        cli::cli_abort("The `label` in mapping should be specified, and the data should not be numeric type!")
     }
 
     geom <- object$geom
@@ -202,6 +210,12 @@ ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
     } else {
         object$mapping <- utils::modifyList(default_mapping, object$mapping)
     }
+
+    flag2 <- .check_colour(plot, object)
+    if (flag2){
+        object$colour <- 'black'
+    }
+
     ly <- do.call(geom, object)    
     ggplot_add(ly, plot, object_name)
 }
@@ -210,6 +224,8 @@ ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
 
 ##' @title sc_dim_geom_ellipse
 ##' @rdname sc-dim-geom-ellipse
+##' @param geom the layer function, default is \code{stat_ellipse},
+##' other option is \code{geom_mark_hull} of \code{ggforce}.
 ##' @param mapping aesthetic mapping
 ##' @param level the level at which to draw an ellipse
 ##' @param ... additional parameters pass to the stat_ellipse
@@ -230,8 +246,8 @@ ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
 ##' p1 <- sc_dim(sce, reduction = 'UMAP', mapping = aes(colour = Cell_Cycle))
 ##' p2 <- sc_dim(sce, reduction = 'UMAP')
 ##' f1 <- p1 + sc_dim_geom_ellipse()
-sc_dim_geom_ellipse <- function(mapping = NULL, level = 0.95, ...) {
-    structure(list(mapping = mapping, level = level, ...), 
+sc_dim_geom_ellipse <- function(geom = stat_ellipse, mapping = NULL, level = 0.95, ...) {
+    structure(list(geom = geom, mapping = mapping, level = level, ...), 
               class = "sc_dim_geom_ellipse")
 }
 
@@ -243,7 +259,16 @@ sc_dim_geom_ellipse <- function(mapping = NULL, level = 0.95, ...) {
 ##' @export
 ggplot_add.sc_dim_geom_ellipse <- function(object, plot, object_name) {
     dims <- names(plot$data)[seq_len(3)]
-    lab.text <- plot$labels$colour
+    if (!is.null(object$mapping$group)){
+        lab.text <- ggfun::get_aes_var(object$mapping, 'group')
+        object$mapping$group <- NULL
+    }else{
+        lab.text <- plot$labels$colour
+    }
+    flag1 <- lab.text %in% colnames(plot$data) && !is.numeric(plot$data[[lab.text]])
+    if (!flag1){
+        cli::cli_abort("The `group` in mapping should be specified, and the data should not be numeric type!")
+    }
     default_mapping <- aes(x = !!rlang::sym(dims[2]), 
                            y = !!rlang::sym(dims[3]), 
                            group = !!rlang::sym(lab.text))
@@ -253,8 +278,16 @@ ggplot_add.sc_dim_geom_ellipse <- function(object, plot, object_name) {
         mapping <- modifyList(default_mapping, object$mapping)
     }
     object$mapping <- mapping
+    
+    flag2 <- .check_colour(plot, object)
+    if (flag2){
+        object$colour <- 'black'
+    }
+    
+    geomfun <- object$geom
+    object$geom <- NULL
 
-    ly <- do.call(stat_ellipse, object)
+    ly <- do.call(geomfun, object)
     ggplot_add(ly, plot, object_name)
 }
 

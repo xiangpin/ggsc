@@ -100,3 +100,12 @@
   res <- res$center |> as.matrix() |> t() |> data.frame()
   return(res)
 }
+
+.check_colour <- function(x, y){
+  lab.text <- x$labels$colour
+  flag1 <- is.numeric(x$data[[lab.text]])
+  flag2 <- any(c("color", "colour") %in% names(y$mapping)) || any(c("color", "colour") %in% names(y))
+  flag1 && !flag2
+}
+
+

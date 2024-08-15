@@ -4,9 +4,12 @@
 \alias{sc_dim_geom_ellipse}
 \title{sc_dim_geom_ellipse}
 \usage{
-sc_dim_geom_ellipse(mapping = NULL, level = 0.95, ...)
+sc_dim_geom_ellipse(geom = stat_ellipse, mapping = NULL, level = 0.95, ...)
 }
 \arguments{
+\item{geom}{the layer function, default is \code{stat_ellipse},
+other option is \code{geom_mark_hull} of \code{ggforce}.}
+
 \item{mapping}{aesthetic mapping}
 
 \item{level}{the level at which to draw an ellipse}
