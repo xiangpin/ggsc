@@ -62,7 +62,8 @@ Suggests:
   SeuratObject,
   SpatialExperiment,
   STexampleData,
-  testthat (>= 3.0.0)
+  testthat (>= 3.0.0),
+  MASS
 BugReports: https://github.com/YuLab-SMU/ggsc/issues 
 URL: https://github.com/YuLab-SMU/ggsc (devel), https://yulab-smu.top/ggsc/ (docs)
 biocViews: DimensionReduction, GeneExpression, SingleCell, 

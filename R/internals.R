@@ -58,3 +58,54 @@
               "#78c679", "#7f0000", "#41b6c4", "#e7298a", "#54278f")
     grDevices::colorRampPalette(col2)(n)
 }
+
+# This was refering to the stat_ellipse of ggplot2
+.calculate_ellipse <- function(data, vars, type = 't', level= NULL, segments=50){
+  dfn <- 2
+  dfd <- nrow(data) - 1
+  if (is.null(level)){
+     level <- .9
+  }
+
+  if (!type %in% c("t", "norm", "euclid")) {
+    cli::cli_inform("Unrecognized ellipse type")
+    ellipse <- matrix(NA_real_, ncol = 2)
+  } else if (dfd < 3) {
+    cli::cli_inform("Too few points to calculate an ellipse")
+    ellipse <- matrix(NA_real_, ncol = 2)
+  } else {
+    if (type == "t") {
+      v <- MASS::cov.trob(data[,vars])
+    } else if (type == "norm") {
+      v <- stats::cov.wt(data[,vars])
+    } else if (type == "euclid") {
+      v <- stats::cov.wt(data[,vars])
+      v$cov <- diag(rep(min(diag(v$cov)), 2))
+    }
+    shape <- v$cov
+    center <- v$center
+    chol_decomp <- chol(shape)
+    if (type == "euclid") {
+      radius <- level/max(chol_decomp)
+    } else {
+      radius <- sqrt(dfn * stats::qf(level, dfn, dfd))
+    }
+    angles <- (0:segments) * 2 * pi/segments
+    unit.circle <- cbind(cos(angles), sin(angles))
+    ellipse <- t(center + radius * t(unit.circle %*% chol_decomp))
+  }
+
+  colnames(ellipse) <- vars
+  res <- stats::cov.wt(ellipse)
+  res <- res$center |> as.matrix() |> t() |> data.frame()
+  return(res)
+}
+
+.check_colour <- function(x, y){
+  lab.text <- x$labels$colour
+  flag1 <- is.numeric(x$data[[lab.text]])
+  flag2 <- any(c("color", "colour") %in% names(y$mapping)) || any(c("color", "colour") %in% names(y))
+  flag1 && !flag2
+}
+
+
