@@ -82,7 +82,7 @@ library(dplyr)
 
 top20 <- pbmc.markers |>
     group_by(cluster) |>
-    filter(avg_log2FC > 1) |>
+    dplyr::filter(avg_log2FC > 1) |>
     slice_head(n = 20) |>
     ungroup()
 
@@ -146,6 +146,24 @@ sc_dim(pbmc, alpha=.3) +
     ggnewscale::new_scale_color() +
     sc_dim_geom_feature(pbmc, features, mapping=aes(color=features)) +
     scale_color_viridis_d()
+
+sc_feature(pbmc,
+           mapping = aes(bg_colour = RNA_snn_res.0.5),
+           features = features,
+           reduction = 'umap',
+           geom = geom_bgpoint,
+           pointsize = 1
+  ) +
+  ggnewscale::new_scale_color() +
+  sc_dim_geom_ellipse(
+     mapping = aes(group = RNA_snn_res.0.5, colour=RNA_snn_res.0.5),
+  ) +
+  sc_dim_geom_label(
+     geom = shadowtext::geom_shadowtext,
+     mapping = aes(label = RNA_snn_res.0.5, colour = RNA_snn_res.0.5),
+     bg.color = 'white',
+     size = 5
+  )
 ```
 
 ```{r dim-feature-density, fig.width=14, fig.height=6}
