@@ -58,12 +58,26 @@ library(ggplot2)
 library(ggsc)
 
 sc_dim(pbmc) + sc_dim_geom_label()
-
+# using vector point layer when geom = geom_bgpoint
+sc_dim(pbmc, geom = geom_bgpoint, pointsize=1) + sc_dim_geom_label()
 
 p <- sc_dim(pbmc) + 
     sc_dim_geom_label(geom = shadowtext::geom_shadowtext, 
             color='black', bg.color='white')
 p
+f <- sc_dim(pbmc, bg_colour = 'black') +
+    sc_dim_geom_label(geom = shadowtext::geom_shadowtext, 
+    color = 'black', bg.color='white')
+f
+f2 <- sc_dim(pbmc, 
+             mapping = aes(bg_colour = ident), 
+             geom = geom_bgpoint, 
+             pointsize=1,
+	     gap_line_width=.2
+      ) +
+      sc_dim_geom_label(geom = shadowtext::geom_shadowtext,
+      color = 'black', bg.color='white')
+f2
 ```
 
 
@@ -81,10 +95,10 @@ plot_list(p, p2, widths=c(1, .5))
 library(dplyr)
 
 top20 <- pbmc.markers |>
-    group_by(cluster) |>
+    dplyr::group_by(cluster) |>
     dplyr::filter(avg_log2FC > 1) |>
-    slice_head(n = 20) |>
-    ungroup()
+    dplyr::slice_head(n = 20) |>
+    dplyr::ungroup()
 
 library(clusterProfiler)
 library(enrichplot)
@@ -119,11 +133,15 @@ features = c("MS4A1", "GNLY", "CD3E",
 
 # FeaturePlot(pbmc,'CD4')
 sc_feature(pbmc, 'CD4')
+sc_feature(pbmc, "CD4", bg_colour = 'black', geom = geom_bgpoint)
+sc_feature(pbmc, "CD4", mapping = aes(bg_colour = ident))
 ```
 
 
 ```{r feature-plot-multi}
 sc_feature(pbmc, features)
+
+sc_feature(pbmc, features, mapping = aes(bg_color = ident), geom = geom_bgpoint, pointsize=.5)
 ```
 
 
@@ -139,8 +157,8 @@ sc_dim(pbmc, alpha=.3) +
     sc_dim_geom_feature(pbmc, features, mapping=aes(color=features)) +
     scale_color_viridis_d()
 
-sc_dim(pbmc) +
-    sc_dim_geom_feature(pbmc, 'CD4', color='black')
+sc_dim(pbmc, geom = geom_bgpoint) +
+    sc_dim_geom_feature(pbmc, 'CD4', bg_colour = 'grey')
 
 sc_dim(pbmc, alpha=.3) +
     ggnewscale::new_scale_color() +
@@ -171,6 +189,25 @@ p1 <- sc_feature(pbmc, features='CD3E', density = FALSE) + scale_color_viridis_c
 p2 <- sc_feature(pbmc, features='CD3E', density = TRUE) + scale_color_viridis_c()
 
 p1 | p2
+
+f1 <- sc_feature(pbmc, features = 'CD3E', 
+                 mapping = aes(bg_colour = ident), 
+                 geom = geom_bgpoint, 
+                 density = FALSE, 
+                 bg_line_width = .4,
+                 gap_line_width = .2,
+                 size = .5) + 
+                 scale_color_viridis_c()
+f2 <- sc_feature(pbmc, features = 'CD3E', 
+                 mapping = aes(bg_colour = ident), 
+                 geom = geom_bgpoint, 
+                 density = TRUE,
+                 bg_line_width = .4,
+                 gap_line_width = .22,
+                 size = .8) + 
+		 scale_color_viridis_c()
+
+f1 | f2
 ```
 
 ## Visualize ellipse on a dimensional reduction plot
@@ -189,8 +226,8 @@ sc_dim(pbmc) +
 ```
 
 ```{r dim-sub-label}
-sc_dim(pbmc, color='grey') + 
-  sc_dim_geom_sub(subset=selected) + 
+sc_dim(pbmc, color='grey', geom = geom_bgpoint, pointsize=1) + 
+  sc_dim_geom_sub(subset=selected, mapping = aes(bg_colour = ident)) + 
     sc_dim_geom_label(geom = shadowtext::geom_shadowtext, 
           mapping = aes(subset = ident %in% selected),
             color='black', bg.color='white')
@@ -216,11 +253,12 @@ sc_dot(pbmc, features=features)
 ```{r sc-violin}
 # VlnPlot(pbmc,'CD4')
 
-sc_violin(pbmc, 'CD4')
+sc_violin(pbmc, 'CD4') + guides(x = guide_axis(angle = -45))
 
 ## allows applying an user-defined function to transform/filter the data
 sc_violin(pbmc, 'CD4', .fun=function(d) dplyr::filter(d, value > 0)) +
-  ggforce::geom_sina(size=.1)
+  ggforce::geom_sina(size=.1) +
+  guides(x = guide_axis(angle = -45))
 ```
 
 ```{r sc-violin-multi, fig.height=9}
@@ -235,6 +273,9 @@ sc_violin(pbmc, features) +
 
 ```{r sc_spatial-data}
 library(SeuratData)
+if (!requireNamespace("SVP", quietly=TRUE)){
+    remotes::install_github("YuLab-SMU/SVP")
+}
 # InstallData("stxBrain")
 brain <- LoadData("stxBrain", type = "anterior1")
 # Normalization 
@@ -242,10 +283,41 @@ brain <- SCTransform(brain, assay = "Spatial", verbose = FALSE)
 ```
 
 ```{r sc_spatial, fig.width=10, fig.height=10}
-## SpatialFeaturePlot(brain, features = c("Hpca", "Ttr"))\
-f1 <- sc_spatial(brain, features = c("Hpca", "Ttr"), image.mirror.axis = 'v')
-f2 <- sc_spatial(brain, features=c("Hpca", "Ttr"), image.mirror.axis='v',  density=TRUE)
+## SpatialFeaturePlot(brain, features = c("Hpca", "Ttr"))
+f1 <- sc_spatial(brain, features = c("Hpca", "Ttr"), image.mirror.axis = 'v', geom = geom_bgpoint, pointsize=1.5)
+f2 <- sc_spatial(brain, features=c("Hpca", "Ttr"), image.mirror.axis='v', density=TRUE, geom=geom_bgpoint, pointsize=1.5)
 plot_list(f1, f2, ncol=1)
+```
+
+```{r sc_spatail-hight_annot, fig.width = 15, fig.height = 10}
+{library(SingleCellExperiment)
+library(SpatialExperiment)} |> suppressPackageStartupMessages()
+spe.brain <- brain |> as.SingleCellExperiment()
+spe.brain <- as(spe.brain, "SpatialExperiment")
+spatialCoords(spe.brain) <- GetTissueCoordinates(brain)[,seq(2)] |> as.matrix()
+spe.brain
+library(SVP)
+res.lisa1 <- runLISA(spe.brain, features = c("Hpca", "Ttr"), assay.type = 'logcounts', weight.method='knn', k=20)
+da.lisa1 <- res.lisa1 |> lapply(function(x)x |> tibble::rownames_to_column(var='.BarcodeID')) |> dplyr::bind_rows(.id='features')
+head(da.lisa1)
+# The features and .BarcodeID must be provided
+# which be the same to the .BarcodeID and features of 
+# f1$data
+f1 + sc_geom_annot(
+        data=da.lisa1, 
+        mapping = aes(bg_color=cluster.test, subset=cluster.test=='High'), 
+        pointsize =1.5,
+        bg_line_width = .3, 
+        gap_line_width=.3,
+      ) +
+      scale_bg_colour_manual(values = 'black')
+f2 + sc_geom_annot(
+        data = da.lisa1,
+	mapping = aes(bg_colour = cluster.test, subset = cluster.test == 'High'),
+	pointsize = 1.5,
+        bg_line_width = .3,
+	gap_line_width = .3) +
+	scale_bg_colour_manual(values = 'black')
 ```
 
 
@@ -257,10 +329,16 @@ f4 <- sc_spatial(brain, features=c("Hpca", "Ttr"), image.mirror.axis='v',
 plot_list(f3, f4, ncol=1)
 ```
 
+```{r sc_spatail-hight_annot_image, fig.width = 15, fig.height = 10}
+
+```
+
 ```{r sc_spatial-pie}
 genes <- rownames(brain) |> sample(10)
 sc_spatial(brain, features=genes, plot.pie=TRUE, 
-        pie.radius.scale=.35, image.plot=FALSE)
+        pie.radius.scale=.35, image.plot=FALSE,
+        color = NA
+	)
 ```
 
 

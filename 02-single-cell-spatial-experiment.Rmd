@@ -61,7 +61,7 @@ dec <- modelGeneVar(spe)
 top.hvgs <- getTopHVGs(dec, prop=0.15)
 spe <- runPCA(spe, subset_row=top.hvgs)
 
-output <- getClusteredPCs(reducedDim(spe), BPPARAM = BiocParallel::MulticoreParam(workers=2))
+output <- getClusteredPCs(reducedDim(spe), BPPARAM = BiocParallel::MulticoreParam(workers=1))
 npcs <- metadata(output)$chosen
 npcs
 
@@ -185,18 +185,32 @@ aplot::plot_list(gglist = pp)
 ```
 
 ```{r sce_spatial-density, fig.width=10, fig.height=10}
-f1 <- sc_spatial(spe, features=target.features[1:2], image.rotate.degree=-90) 
-f2 <- sc_spatial(spe, features=target.features[1:2], image.rotate.degree=-90, density=TRUE) 
+if (!requireNamespace('SVP', quietly=T)){
+    remotes::install_github("YuLab-SMU/SVP")
+}
+library(SVP)
+lisa.res1 <- runLISA(spe,assay.type='logcounts', features=target.features[seq(2)], weight.method='knn', k=50)
+lisa.da <- lapply(lisa.res1, function(x)x|> tibble::rownames_to_column(var='.BarcodeID')) |> dplyr::bind_rows(.id="features")
 
+f1 <- sc_spatial(spe, features=target.features[1:2], mapping=aes(x=pxl_col_in_fullres,y=pxl_row_in_fullres), geom=geom_bgpoint, pointsize=1) 
+f2 <- sc_spatial(spe, features=target.features[1:2], mapping=aes(x=pxl_col_in_fullres,y=pxl_row_in_fullres), density=TRUE) 
+f1 <- f1 + sc_geom_annot(
+      data = lisa.da,
+      mapping = aes(bg_colour = cluster.test, subset = cluster.test == 'High'),
+      pointsize = 1,
+      bg_line_width = .3,
+      gap_line_width = .3      
+)
 plot_list(f1, f2, ncol=1)
 ```
 
 
 ```{r sce_spatial-density-join, fig.width=15, fig.height=10}
-
-f3 <- sc_spatial(spe, features=target.features[1:2], image.rotate.degree=-90, 
+f3 <- sc_spatial(spe, features=target.features[1:2], 
+              mapping=aes(x=pxl_col_in_fullres,y=pxl_row_in_fullres),
               density=TRUE, joint=TRUE) 
-f4 <- sc_spatial(spe, features=target.features[1:2], image.rotate.degree=-90, 
+f4 <- sc_spatial(spe, features=target.features[1:2], 
+              mapping=aes(x=pxl_col_in_fullres,y=pxl_row_in_fullres),
               density=TRUE, joint=TRUE, common.legend=FALSE)
 
 plot_list(f3, f4, ncol=1)
@@ -206,5 +220,5 @@ plot_list(f3, f4, ncol=1)
 
 ```{r sce-spatial-pie}
 sc_spatial(spe, features=target.features, plot.pie=TRUE, 
-        pie.radius.scale=.35, linewidth=0.1, image.plot=FALSE)
+        pie.radius.scale=.35, linewidth=0.1, image.plot=FALSE, color=NA)
 ```
