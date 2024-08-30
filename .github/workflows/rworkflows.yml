@@ -30,12 +30,12 @@ jobs:
         - os: macOS-latest
           bioc: release
           r: auto
-          cont: ghcr.io/bioconductor/bioconductor_docker:RELEASE_3_19
+          cont: ~
           rspm: ~
         - os: windows-latest
           bioc: release
           r: auto
-          cont: ghcr.io/bioconductor/bioconductor_docker:RELEASE_3_19 
+          cont: ~
           rspm: ~
     steps:
     - uses: neurogenomics/rworkflows@master
