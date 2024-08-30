@@ -158,6 +158,7 @@ ggplot_add.sc_dim_geom_feature <- function(object, plot, object_name){
 ##' @title sc_dim_geom_label
 ##' @rdname sc-dim-geom-label
 ##' @param geom geometric layer (default: geom_text) to display the lables
+##' @param mapping aesthetic mapping
 ##' @param ... additional parameters pass to the geom
 ##' @return layer of labels
 ##' @export
@@ -175,8 +176,8 @@ ggplot_add.sc_dim_geom_feature <- function(object, plot, object_name){
 ##' p1 <- sc_dim(sce, reduction = 'UMAP', mapping = aes(colour = Cell_Cycle))
 ##' p2 <- sc_dim(sce, reduction = 'UMAP')
 ##' f1 <- p1 + sc_dim_geom_label()
-sc_dim_geom_label <- function(geom = ggplot2::geom_text, ...) {
-    structure(list(geom = geom, ...),
+sc_dim_geom_label <- function(geom = ggplot2::geom_text, mapping=NULL, ...) {
+    structure(list(geom = geom, mapping = mapping, ...),
         class = "sc_dim_geom_label")
 }
 
@@ -198,6 +199,7 @@ ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
             lapply(function(x).calculate_ellipse(x, vars = dims[c(2, 3)], level=object$level)) |>
             dplyr::bind_rows(.id=lab.text) 
         object$level <- NULL
+        object$data <- .set_label_levels(object$data, plot, lab.text)
     }else{
         cli::cli_abort("The `label` in mapping should be specified, and the data should not be numeric type!")
     }
@@ -215,6 +217,8 @@ ggplot_add.sc_dim_geom_label <- function(object, plot, object_name) {
     if (flag2){
         object$colour <- 'black'
     }
+    
+    object <- .set_inherit.aes(object)
 
     ly <- do.call(geom, object)    
     ggplot_add(ly, plot, object_name)
@@ -283,7 +287,7 @@ ggplot_add.sc_dim_geom_ellipse <- function(object, plot, object_name) {
     if (flag2){
         object$colour <- 'black'
     }
-    
+    object <- .set_inherit.aes(object)    
     geomfun <- object$geom
     object$geom <- NULL
 

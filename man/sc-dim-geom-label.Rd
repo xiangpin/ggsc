@@ -4,10 +4,12 @@
 \alias{sc_dim_geom_label}
 \title{sc_dim_geom_label}
 \usage{
-sc_dim_geom_label(geom = ggplot2::geom_text, ...)
+sc_dim_geom_label(geom = ggplot2::geom_text, mapping = NULL, ...)
 }
 \arguments{
 \item{geom}{geometric layer (default: geom_text) to display the lables}
+
+\item{mapping}{aesthetic mapping}
 
 \item{...}{additional parameters pass to the geom}
 }

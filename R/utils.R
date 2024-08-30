@@ -50,3 +50,18 @@
     class(x) <- c(unique(clsnm), unique(old))
     return(x)
 }
+
+.set_label_levels <- function(data, plot, lab.text){
+    lab.levels <- levels(plot$data[[lab.text]])
+    if (!is.null(lab.levels)){
+        data[[lab.text]] <- factor(data[[lab.text]], levels=lab.levels)
+    }
+    return(data)
+}
+
+.set_inherit.aes <- function(x){
+    if (!'inherit.aes' %in% names(x)){
+        x$inherit.aes <- FALSE
+    }
+    return(x)
+}
