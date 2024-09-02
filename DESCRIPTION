@@ -63,6 +63,7 @@ Suggests:
   SpatialExperiment,
   STexampleData,
   testthat (>= 3.0.0),
+  ggh4x,
   MASS
 BugReports: https://github.com/YuLab-SMU/ggsc/issues 
 URL: https://github.com/YuLab-SMU/ggsc (devel), https://yulab-smu.top/ggsc/ (docs)

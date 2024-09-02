@@ -38,9 +38,8 @@
 ##'      this should be set in \code{mapping}.
 ##'  }
 ##' @return ggplot object
-##' @importFrom ggplot theme element_rect
-##' @importFrom ggh4x facet_nested_wrap
-##' @importFrom magrittr %>% 
+##' @importFrom ggplot2 theme element_rect
+##' @importFrom stats as.formula
 ##' @export
 ##' @examples
 ##' \dontrun{
@@ -80,7 +79,7 @@ plot_lisa_feature <- function(spe,
     rownames(spe) <- gsub(prefix.gsub, "", rownames(spe))
     feature <- gsub(prefix.gsub, "", feature)
     if (is.null(reduction)){
-        cnm <- spatialCoordsNames(spe)
+        cnm <- SpatialExperiment::spatialCoordsNames(spe)
         p <- sc_spatial(spe,
                         feature,
                         mapping = aes(x=!!rlang::sym(cnm[1]), y = !!rlang::sym(cnm[2])),
@@ -120,7 +119,7 @@ plot_lisa_feature <- function(spe,
     }
     p1 <- p %add+% sc_geom_annot(
                     data = lisa.res,
-                    mapping = aes(bg_colour = cluster.test, subset = cluster.test %in% clustertype),
+                    mapping = aes(bg_colour = lisa.res$cluster.test, subset = lisa.res$cluster.test %in% clustertype),
                     pointsize = hlpointsize,
                     gap_line_width = gap_line_width,
                     bg_line_width = bg_line_width
