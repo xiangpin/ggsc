@@ -1,15 +1,15 @@
 ##' @title plot_lisa_feature
 ##' @rdname plot-lisa-feature
-##' @param spe SpatialExperiment object.
-##' @param feature selected features to be visualized.
+##' @param spe SpatialExperiment or SingleCellExperiment object.
 ##' @param lisa.res the result returned by \code{SVP::runLISA()}.
+##' @param features selected features to be visualized, default is NULL.
 ##' @param assay.type the assay name where data will be used from
 ##' (e.g., 'data', 'counts'), default is \code{'logcounts'}.
 ##' @param geom the function of geometric layer, default is \code{geom_bgpoint}, 
 ##' other option is \code{sc_geom_point}.
-##' @param pointsize numeric the size of point, default is \code{10}.
+##' @param pointsize numeric the size of point, default is \code{2}.
 ##' @param hlpointsize numeric the size of point which contains corresbonding
-##' spatially variable gene(i.e., SVG), default is \code{8}.
+##' spatially variable gene(i.e., SVG), default is \code{1.8}.
 ##' @param clustertype cell type which is from the result of \code{lisa.res},
 ##' default is \code{'High'}.
 ##' @param hlcolor the color of circular line which enfolds the point 
@@ -20,25 +20,20 @@
 ##' default is \code{0.3}.
 ##' @param facet_name the name of facet used in \code{ggh4x::facet_nested_wrap()},
 ##' default is \code{NULL}.
-##' @param type the type of the name of gene's prefix that will be substituted
-##' with \code{""}, default is \code{'TFT'}, other options are \code{'GO.BP'} and \code{'Reactome'}.
 ##' @param reduction reduction method, default is \code{NULL} and will 
 ##' use the default setting store in the object
+##' @param image.plot logical whether display the image of spatial experiment, default
+##' is FALSE.
+##' @param label_wrap_width numeric maximum number of characters before wrapping the strip.
+##' default is \code{30}.
 ##' @param ... additional parameters pass to \code{scattermore::geom_scattermore()}
 ##' \itemize{
 ##'     \item \code{bg_colour} the colour of background point, default is \code{NA}.
 ##'      this character also can be set in \code{mappint}.
-##'     \item \code{gap_colour} the colour of gap background, default is \code{'white'}.
-##'     \item \code{bg_line_width} the line width of background point,
-##'      default is \code{.3}.
-##'     \item \code{gap_line_width} the gap line width of background point,
-##'      default is \code{.1}.
 ##'     \item \code{alpha} the transparency of colour, default is 1.
-##'     \item \code{subset} subset the data frame which meet conditions to display.
-##'      this should be set in \code{mapping}.
 ##'  }
 ##' @return ggplot object
-##' @importFrom ggplot2 theme element_rect
+##' @importFrom ggplot2 theme element_rect label_wrap_gen
 ##' @importFrom stats as.formula
 ##' @export
 ##' @examples
@@ -47,53 +42,68 @@
 ##' library(ggh4x)
 ##' library(SingleCellExperiment) |> suppressPackageStartupMessages()
 ##' library(SpatialExperiment) |> suppressPackageStartupMessages()
-##' spe <- readRDS("./Visium_humanDLPFC.spe.rds")
+##' library(STexampleData)
+##' # create ExperimentHub instance
+##' eh <- ExperimentHub()
+##' # query STexampleData datasets
+##' myfiles <- query(eh, "STexampleData")
+##' ah_id <- myfiles$ah_id[myfiles$title == 'Visium_humanDLPFC']
+##' spe <- myfiles[[ah_id]]
+##' spe <- spe[, colData(spe)$in_tissue == 1]
 ##' spe <-scater::logNormCounts(spe)
 ##' genes <- c('MOBP', 'PCP4', 'SNAP25', 'HBB', 'IGKC', 'NPY')
 ##' target.features <- rownames(spe)[match(genes, rowData(spe)$gene_name)]
+##' library(SVP)
 ##' lisa.res1 <- runLISA(spe,
 ##'                      assay.type='logcounts',
 ##'                      features=target.features[seq(2)],
 ##'                      weight.method='knn', 
-##'			 k=50)
-##' plot_lisa_feature(spe, lisa.res=lisa.res1, feature=target.features[seq(2)],
+##'                      k=50)
+##' plot_lisa_feature(spe, lisa.res=lisa.res1, features=target.features[seq(2)],
 ##'                   pointsize=2, hlpointsize=2, gap_line_width=.1)
 ##' }
 plot_lisa_feature <- function(spe,
-                         feature,
                          lisa.res,
+                         features = NULL,
                          assay.type = 'logcounts',
                          geom = geom_bgpoint,
-                         pointsize = 10,
-                         hlpointsize = 8,
+                         pointsize = 2,
+                         hlpointsize = 1.8,
                          clustertype = 'High',
                          hlcolor = c('black'),
                          gap_line_width = .1,
                          bg_line_width = .3,
                          facet_name = NULL,
-                         type = 'TFT',
                          reduction = NULL,
+                         image.plot = FALSE,
+                         label_wrap_width = 30,
                          ...
                          ){
-    prefix.gsub <- switch(type, TFT="_TARGET_GENES|_UNKNOWN", GO.BP="GOBP_", Reactome="REACTOME_")
-    rownames(spe) <- gsub(prefix.gsub, "", rownames(spe))
-    feature <- gsub(prefix.gsub, "", feature)
+    if (missing(lisa.res) || is.null(lisa.res)){
+        if (is.null(features)){
+            cli::cli_abort("The {.var features} should not be `NULL`, when {.var lisa.res} is missing or NULL.")
+        }
+    }else if(inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
+        names(lisa.res) <- gsub("_", " ", names(lisa.res))
+        features <- names(lisa.res)
+    }
+    rownames(spe) <- gsub("_", " ", rownames(spe))
     if (is.null(reduction)){
         cnm <- SpatialExperiment::spatialCoordsNames(spe)
         p <- sc_spatial(spe,
-                        feature,
+                        features,
                         mapping = aes(x=!!rlang::sym(cnm[1]), y = !!rlang::sym(cnm[2])),
                         pointsize = pointsize,
                         slot = assay.type,
                         gap_colour = NA,
-                        image.plot = FALSE,
+                        image.plot = image.plot,
                         geom = geom,
                         ...
         )
     }else{
         p <- sc_feature(
                spe,
-               features = feature,
+               features = features,
                reduction = reduction,
                geom = geom,
                pointsize = pointsize,
@@ -107,7 +117,6 @@ plot_lisa_feature <- function(spe,
     }
 
     if (inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
-        names(lisa.res) <- gsub(prefix.gsub, "", names(lisa.res))
         lisa.res <- lisa.res |>
                     lapply(function(x)x|>tibble::rownames_to_column(var='.BarcodeID')) |>
                     dplyr::bind_rows(.id='features')
@@ -119,7 +128,7 @@ plot_lisa_feature <- function(spe,
     }
     p1 <- p %add+% sc_geom_annot(
                     data = lisa.res,
-                    mapping = aes(bg_colour = lisa.res$cluster.test, subset = lisa.res$cluster.test %in% clustertype),
+                    mapping = aes(bg_colour = !!rlang::sym("cluster.test"), subset = !!rlang::sym("cluster.test") %in% clustertype),
                     pointsize = hlpointsize,
                     gap_line_width = gap_line_width,
                     bg_line_width = bg_line_width
@@ -156,7 +165,7 @@ plot_lisa_feature <- function(spe,
            tmpf <- as.formula("~sample_id")
         }
         p1 <- p1 %add+%
-              ggh4x::facet_nested_wrap(tmpf) %add+%
+              ggh4x::facet_nested_wrap(tmpf, labeller = label_wrap_gen(label_wrap_width)) %add+%
               theme(strip.background.x=element_rect(color="white"))
     }
     return(p1)
