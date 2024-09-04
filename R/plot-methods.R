@@ -18,7 +18,7 @@
 ##' top point point layer, default is \code{.1}.
 ##' @param bg_line_width numeric the line width of background point layer,
 ##' default is \code{0.3}.
-##' @param facet_name the name of facet used in \code{ggh4x::facet_nested_wrap()},
+##' @param facet_name the name of facet used in \code{facet_wrap()},
 ##' default is \code{NULL}.
 ##' @param reduction reduction method, default is \code{NULL} and will 
 ##' use the default setting store in the object
@@ -39,7 +39,6 @@
 ##' @examples
 ##' \dontrun{
 ##' library(ggplot2)
-##' library(ggh4x)
 ##' library(SingleCellExperiment) |> suppressPackageStartupMessages()
 ##' library(SpatialExperiment) |> suppressPackageStartupMessages()
 ##' library(STexampleData)
@@ -165,7 +164,7 @@ plot_lisa_feature <- function(spe,
            tmpf <- as.formula("~sample_id")
         }
         p1 <- p1 %add+%
-              ggh4x::facet_nested_wrap(tmpf, labeller = label_wrap_gen(label_wrap_width)) %add+%
+              facet_wrap(tmpf, labeller = label_wrap_gen(label_wrap_width)) %add+%
               theme(strip.background.x=element_rect(color="white"))
     }
     return(p1)

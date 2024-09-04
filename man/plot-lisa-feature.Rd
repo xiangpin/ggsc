@@ -53,7 +53,7 @@ top point point layer, default is \code{.1}.}
 \item{bg_line_width}{numeric the line width of background point layer,
 default is \code{0.3}.}
 
-\item{facet_name}{the name of facet used in \code{ggh4x::facet_nested_wrap()},
+\item{facet_name}{the name of facet used in \code{facet_wrap()},
 default is \code{NULL}.}
 
 \item{reduction}{reduction method, default is \code{NULL} and will
@@ -81,7 +81,6 @@ plot_lisa_feature
 \examples{
 \dontrun{
 library(ggplot2)
-library(ggh4x)
 library(SingleCellExperiment) |> suppressPackageStartupMessages()
 library(SpatialExperiment) |> suppressPackageStartupMessages()
 library(STexampleData)
