@@ -118,7 +118,8 @@ plot_lisa_feature <- function(spe,
     if (inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
         lisa.res <- lisa.res |>
                     lapply(function(x)x|>tibble::rownames_to_column(var='.BarcodeID')) |>
-                    dplyr::bind_rows(.id='features')
+                    dplyr::bind_rows(.id='features') |>
+                    dplyr::mutate(features = factor(.data$features, levels=features))
     }
     if (inherits(p, 'patchwork')){
         `%add+%` <- `&`
@@ -163,10 +164,12 @@ plot_lisa_feature <- function(spe,
         }else{
            tmpf <- as.formula("~sample_id")
         }
-        p1 <- p1 %add+%
+    }else{
+        tmpf <- as.formula("~features")
+    }
+    p1 <- p1 %add+%
               facet_wrap(tmpf, labeller = label_wrap_gen(label_wrap_width)) %add+%
               theme(strip.background.x=element_rect(color="white"))
-    }
     return(p1)
 }
     	
