@@ -80,3 +80,5 @@ LinkingTo:
   Rcpp,
   RcppArmadillo,
   RcppParallel
+Remotes:
+  YuLab-SMU/SVP

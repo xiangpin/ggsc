@@ -57,7 +57,7 @@ ggplot_add.sc_geom_annot <- function(object, plot, object_name){
     if (geomfun == 'geom_scattermore2'){
         geomfun <- "sc_geom_point"
     }else{
-        params$pixels <- NULL
+        object$pixels <- NULL
     }
     ly <- do.call(geomfun, c(object, params))
     ggplot_add(ly, plot, object_name)
