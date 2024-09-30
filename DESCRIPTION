@@ -55,7 +55,7 @@ Suggests:
   rmarkdown,
   scran,
   scater,
-  scatterpie,
+  scatterpie (>= 0.2.4),
   scuttle,
   shadowtext,
   sf,
