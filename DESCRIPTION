@@ -55,7 +55,7 @@ Suggests:
   rmarkdown,
   scran,
   scater,
-  scatterpie,
+  scatterpie (>= 0.2.4),
   scuttle,
   shadowtext,
   sf,
@@ -80,3 +80,5 @@ LinkingTo:
   Rcpp,
   RcppArmadillo,
   RcppParallel
+Remotes:
+  YuLab-SMU/SVP
