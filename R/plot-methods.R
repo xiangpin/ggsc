@@ -119,7 +119,7 @@ plot_lisa_feature <- function(spe,
         lisa.res <- lisa.res |>
                     lapply(function(x)x|>tibble::rownames_to_column(var='.BarcodeID')) |>
                     dplyr::bind_rows(.id='features') |>
-                    dplyr::mutate(features = factor(.data$features, levels=features))
+                    dplyr::mutate(features = factor(.data$features, levels=names(lisa.res)))
     }
     if (inherits(p, 'patchwork')){
         `%add+%` <- `&`
