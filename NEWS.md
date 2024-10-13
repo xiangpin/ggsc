@@ -1,6 +1,6 @@
-# ggsc 1.3.002
+# ggsc 1.3.1
 
-+ `subset_feature()` and `subset_cell()` (2024-08-03, Sat)
++ add `plot_lisa_feature()` (2024-09-06, #34)
 + add `geom_bgpoint()` layer (2024-06-18, Tue, #24)
 
 # ggsc 1.2.0

@@ -84,7 +84,11 @@ plot_lisa_feature <- function(spe,
         }
     }else if(inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
         names(lisa.res) <- gsub("_", " ", names(lisa.res))
-        features <- names(lisa.res)
+        if(is.null(features)){
+          features <- names(lisa.res)
+        }else{
+          lisa.res <- lisa.res[features]
+        }
     }
     rownames(spe) <- gsub("_", " ", rownames(spe))
     if (is.null(reduction)){
