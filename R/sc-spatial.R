@@ -94,7 +94,7 @@ setGeneric('sc_spatial', function(object,
                                   joint.fun = prod,
                                   common.legend = TRUE,
                                   pointsize = 5,
-				  geom = sc_geom_point,
+                                  geom = sc_geom_point,
                                   ...) 
            standardGeneric('sc_spatial')
 )

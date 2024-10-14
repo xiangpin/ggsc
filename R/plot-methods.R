@@ -26,6 +26,7 @@
 ##' is FALSE.
 ##' @param label_wrap_width numeric maximum number of characters before wrapping the strip.
 ##' default is \code{30}.
+##' @param ncol numeric the column number, default is 6.
 ##' @param ... additional parameters pass to \code{scattermore::geom_scattermore()}
 ##' \itemize{
 ##'     \item \code{bg_colour} the colour of background point, default is \code{NA}.
@@ -76,21 +77,31 @@ plot_lisa_feature <- function(spe,
                          reduction = NULL,
                          image.plot = FALSE,
                          label_wrap_width = 30,
+                         ncol = 6,
                          ...
                          ){
     if (missing(lisa.res) || is.null(lisa.res)){
         if (is.null(features)){
             cli::cli_abort("The {.var features} should not be `NULL`, when {.var lisa.res} is missing or NULL.")
+        }else{
+            features.nm <- features
         }
     }else if(inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
+        if (!is.null(features)){
+            lisa.res <- lisa.res[features]
+        }
         names(lisa.res) <- gsub("_", " ", names(lisa.res))
-        features <- names(lisa.res)
+        features.nm <- names(lisa.res)
+        lisa.res <- lisa.res |>
+                    lapply(function(x)x|>tibble::rownames_to_column(var='.BarcodeID')) |>
+                    dplyr::bind_rows(.id='features') |>
+                    dplyr::mutate(features = factor(.data$features, levels=features.nm)) 
     }
     rownames(spe) <- gsub("_", " ", rownames(spe))
     if (is.null(reduction)){
         cnm <- SpatialExperiment::spatialCoordsNames(spe)
         p <- sc_spatial(spe,
-                        features,
+                        features.nm,
                         mapping = aes(x=!!rlang::sym(cnm[1]), y = !!rlang::sym(cnm[2])),
                         pointsize = pointsize,
                         slot = assay.type,
@@ -102,7 +113,7 @@ plot_lisa_feature <- function(spe,
     }else{
         p <- sc_feature(
                spe,
-               features = features,
+               features = features.nm,
                reduction = reduction,
                geom = geom,
                pointsize = pointsize,
@@ -115,12 +126,6 @@ plot_lisa_feature <- function(spe,
         return(p)
     }
 
-    if (inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
-        lisa.res <- lisa.res |>
-                    lapply(function(x)x|>tibble::rownames_to_column(var='.BarcodeID')) |>
-                    dplyr::bind_rows(.id='features') |>
-                    dplyr::mutate(features = factor(.data$features, levels=features))
-    }
     if (inherits(p, 'patchwork')){
         `%add+%` <- `&`
     }else{
@@ -168,7 +173,7 @@ plot_lisa_feature <- function(spe,
         tmpf <- as.formula("~features")
     }
     p1 <- p1 %add+%
-              facet_wrap(tmpf, labeller = label_wrap_gen(label_wrap_width)) %add+%
+              facet_wrap(tmpf, labeller = label_wrap_gen(label_wrap_width), ncol=ncol) %add+%
               theme(strip.background.x=element_rect(color="white"))
     return(p1)
 }
