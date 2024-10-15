@@ -87,7 +87,7 @@ arma::mat outergrid(arma::vec grid, arma::vec x){
 
 struct CalWkde : public Worker{
   const arma::mat& x;
-  const arma::mat& w;
+  const arma::sp_mat& w;
   const arma::mat& ax;
   const arma::mat& ay;
   const arma::vec& H;
@@ -96,14 +96,14 @@ struct CalWkde : public Worker{
 
   arma::mat& result;
 
-  CalWkde(const arma::mat& x, const arma::mat& w, const arma::mat& ax,
+  CalWkde(const arma::mat& x, const arma::sp_mat& w, const arma::mat& ax,
          const arma::mat& ay, const arma::vec& H, const arma::uvec& indx, 
          const arma::uvec& indy, mat& result)
   : x(x), w(w), ax(ax), ay(ay), H(H), indx(indx), indy(indy), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
     for (uword i = begin; i < end; i++){
-        result.col(i) = Kde2dWeightedCpp(x, w.row(i), ax, ay, H, indx, indy);
+        result.col(i) = Kde2dWeightedCpp(x, w.row(i).as_dense(), ax, ay, H, indx, indy);
     }
   }
 };
@@ -121,7 +121,7 @@ struct CalWkde : public Worker{
 arma::mat CalWkdeCpp(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullable<NumericVector> h, 
         double adjust = 1.0, int n = 400) {
 
-  arma::mat wv = conv_to<arma::mat>::from(w);
+  //arma::mat wv = conv_to<arma::mat>::from(w);
 
   arma::mat result(x.n_rows, w.n_rows);
 
@@ -144,8 +144,8 @@ arma::mat CalWkdeCpp(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullable<Numer
   arma::mat ax = outergrid(gx, x.col(0));
   arma::mat ay = outergrid(gy, x.col(1));
 
-  uword num = wv.n_rows;
-  CalWkde calWkde(x, wv, ax, ay, H, indx, indy, result);
+  uword num = w.n_rows;
+  CalWkde calWkde(x, w, ax, ay, H, indx, indy, result);
   parallelFor(0, num, calWkde);
 
   return (result);
