@@ -81,20 +81,25 @@ plot_lisa_feature <- function(spe,
     if (missing(lisa.res) || is.null(lisa.res)){
         if (is.null(features)){
             cli::cli_abort("The {.var features} should not be `NULL`, when {.var lisa.res} is missing or NULL.")
+        }else{
+            features.nm <- features
         }
     }else if(inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
-        names(lisa.res) <- gsub("_", " ", names(lisa.res))
-        if(is.null(features)){
-          features <- names(lisa.res)
-        }else{
-          lisa.res <- lisa.res[features]
+        if (!is.null(features)){
+            lisa.res <- lisa.res[features]
         }
+        names(lisa.res) <- gsub("_", " ", names(lisa.res))
+        features.nm <- names(lisa.res)
+        lisa.res <- lisa.res |>
+                    lapply(function(x)x|>tibble::rownames_to_column(var='.BarcodeID')) |>
+                    dplyr::bind_rows(.id='features') |>
+                    dplyr::mutate(features = factor(.data$features, levels=features.nm))    
     }
     rownames(spe) <- gsub("_", " ", rownames(spe))
     if (is.null(reduction)){
         cnm <- SpatialExperiment::spatialCoordsNames(spe)
         p <- sc_spatial(spe,
-                        features,
+                        features.nm,
                         mapping = aes(x=!!rlang::sym(cnm[1]), y = !!rlang::sym(cnm[2])),
                         pointsize = pointsize,
                         slot = assay.type,
@@ -106,7 +111,7 @@ plot_lisa_feature <- function(spe,
     }else{
         p <- sc_feature(
                spe,
-               features = features,
+               features = features.nm,
                reduction = reduction,
                geom = geom,
                pointsize = pointsize,
@@ -119,12 +124,6 @@ plot_lisa_feature <- function(spe,
         return(p)
     }
 
-    if (inherits(lisa.res, 'SimpleList') || inherits(lisa.res, "list")){
-        lisa.res <- lisa.res |>
-                    lapply(function(x)x|>tibble::rownames_to_column(var='.BarcodeID')) |>
-                    dplyr::bind_rows(.id='features') |>
-                    dplyr::mutate(features = factor(.data$features, levels=names(lisa.res)))
-    }
     if (inherits(p, 'patchwork')){
         `%add+%` <- `&`
     }else{
