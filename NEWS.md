@@ -1,3 +1,7 @@
+# ggsc 1.4.0
+
++ Bioconductor RELEASE_3_20 (2024-10-30, Wed)
+
 # ggsc 1.3.1
 
 + add `plot_lisa_feature()` (2024-09-06, #34, #39)
