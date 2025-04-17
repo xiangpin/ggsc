@@ -1,3 +1,7 @@
+# ggsc 1.6.0
+
++ Bioconductor RELEASE_3_21 (2025-04-17, Thu)
+
 # ggsc 1.4.0
 
 + Bioconductor RELEASE_3_20 (2024-10-30, Wed)
